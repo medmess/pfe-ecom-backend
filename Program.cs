@@ -89,11 +89,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Seed roles + default admins
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     await DbSeeder.SeedAsync(services);
-// }
+app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbSeeder.SeedAsync(services);
+}
 
 app.Run();

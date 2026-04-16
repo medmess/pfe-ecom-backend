@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("pfe.ecom.api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa2c61f15f39989dd5b5ac431164fb5b73043e97")]
 [assembly: System.Reflection.AssemblyProductAttribute("pfe.ecom.api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("pfe.ecom.api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
