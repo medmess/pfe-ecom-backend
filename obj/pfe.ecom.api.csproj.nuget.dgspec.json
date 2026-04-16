@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.api\\pfe.ecom.api\\pfe.ecom.api.csproj": {}
+    "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\pfe.ecom.api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.api\\pfe.ecom.api\\pfe.ecom.api.csproj": {
+    "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\pfe.ecom.api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.api\\pfe.ecom.api\\pfe.ecom.api.csproj",
+        "projectUniqueName": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\pfe.ecom.api.csproj",
         "projectName": "pfe.ecom.api",
-        "projectPath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.api\\pfe.ecom.api\\pfe.ecom.api.csproj",
+        "projectPath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\pfe.ecom.api.csproj",
         "packagesPath": "C:\\Users\\mohamed\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.api\\pfe.ecom.api\\obj\\",
+        "outputPath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -62,15 +62,21 @@
               "target": "Package",
               "version": "[10.0.3, )"
             },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.3, )"
+              "version": "[10.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
               "version": "[10.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[10.0.1, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
