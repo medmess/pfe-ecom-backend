@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
+    public async Task<ActionResult<object>> Register([FromBody] RegisterRequest request)
     {
         try
         {
@@ -97,19 +97,13 @@ public class AuthController : ControllerBase
                 return BadRequest(roleResult.Errors.Select(e => e.Description));
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? roleName;
-            var token = _jwt.CreateToken(user, roles);
-
-            return Ok(new AuthResponse(
-                token,
-                user.Email ?? string.Empty,
-                user.FullName,
-                role,
-                user.AccountType,
-                user.StoreName,
-                user.IsVerifiedSupplier
-            ));
+            return Ok(new
+            {
+                message = "User registered successfully. Please login.",
+                email = user.Email,
+                accountType = user.AccountType,
+                role = roleName
+            });
         }
         catch (Exception ex)
         {
