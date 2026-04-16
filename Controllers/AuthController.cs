@@ -117,7 +117,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<object>> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
         try
         {
@@ -147,14 +147,17 @@ public class AuthController : ControllerBase
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? user.AccountType;
 
-            return Ok(new
-            {
-                message = "Login credentials are valid.",
-                email = user.Email,
-                fullName = user.FullName,
-                role = role,
-                accountType = user.AccountType
-            });
+            var token = _jwt.CreateToken(user, roles);
+
+            return Ok(new AuthResponse(
+                token,
+                user.Email ?? string.Empty,
+                user.FullName,
+                role,
+                user.AccountType,
+                user.StoreName,
+                user.IsVerifiedSupplier
+            ));
         }
         catch (Exception ex)
         {
@@ -165,5 +168,4 @@ public class AuthController : ControllerBase
                 message = "An internal server error occurred during login."
             });
         }
-    }
-}
+    } 
