@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using pfe.ecom.api.Models;
 
@@ -9,17 +8,17 @@ namespace pfe.ecom.api.Services;
 
 public class JwtTokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _config;
 
-    public JwtTokenService(IConfiguration configuration)
+    public JwtTokenService(IConfiguration config)
     {
-        _configuration = configuration;
+        _config = config;
     }
 
-    public string CreateToken(ApplicationUser user, IList<string> roles)
+    public string CreateToken(ApplicationUser user, IList<string>? roles)
     {
-        var jwtKey = _configuration["Jwt:Key"];
-        var jwtIssuer = _configuration["Jwt:Issuer"];
+        var jwtKey = _config["Jwt:Key"];
+        var jwtIssuer = _config["Jwt:Issuer"];
 
         if (string.IsNullOrWhiteSpace(jwtKey))
             throw new InvalidOperationException("JWT Key is missing.");
@@ -29,12 +28,12 @@ public class JwtTokenService
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.NameIdentifier, user.Id ?? string.Empty),
+            new Claim(ClaimTypes.Name, user.Email ?? string.Empty),
             new Claim("fullName", user.FullName ?? string.Empty),
-            new Claim("accountType", user.AccountType ?? string.Empty),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
-            new Claim(ClaimTypes.Name, user.Email ?? string.Empty)
+            new Claim("accountType", user.AccountType ?? string.Empty)
         };
 
         if (roles != null)
@@ -55,7 +54,7 @@ public class JwtTokenService
             issuer: jwtIssuer,
             audience: null,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: creds
         );
 
