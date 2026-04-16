@@ -168,4 +168,5 @@ public class AuthController : ControllerBase
                 message = "An internal server error occurred during login."
             });
         }
-    } 
+    }
+}
