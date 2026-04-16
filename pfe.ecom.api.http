@@ -1,0 +1,6 @@
+@pfe.ecom.api_HostAddress = http://localhost:5201
+
+GET {{pfe.ecom.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Ce fichier est utilisé par le processus de publication/package de votre projet web. Vous pouvez personnaliser le comportement de ce processus
+en modifiant ce fichier MSBuild. Pour en savoir plus à ce sujet, visitez https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAArsJukik3q0SDquQBcKGNCwAAAAACAAAAAAAQZgAAAAEAACAAAAAtsjhXAd6hHLW+XF/iX4rTXsJL6vZ7KLZZIW48kz3sPgAAAAAOgAAAAAIAACAAAAA7UEyNeszi/9+wOMe7CeUKnNPHvJYym5JlaOpVKApMiSAAAABWiAhOv9/JgLo30e7HdQboiX5HX8Yrn87iMYMEhkGE8EAAAAAHLe1ecvgcOagEewaIsPvyLF7eu8IlVZYvLkSF6oPsm5HuwvrhBY94o7ExWaenYKR4Vecz4vKRWVaxSatmHVfr</EncryptedPassword>
+    <History>False|2026-04-13T21:11:44.0117934Z||;False|2026-04-13T21:59:48.9612297+01:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=db47824.databaseasp.net,1433%3bDatabase=db47824%3bUser Id=db47824%3bPassword=YOUR_REAL_PASSWORD%3bEncrypt=False%3bMultipleActiveResultSets=True%3bTrustServerCertificate=True</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="pfe.ecom.api.Data.AppDbContext">
+      <Value>Server=db47824.databaseasp.net,1433%3bDatabase=db47824%3bUser Id=db47824%3bPassword=YOUR_REAL_PASSWORD%3bEncrypt=False%3bMultipleActiveResultSets=True%3bTrustServerCertificate=True</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>
