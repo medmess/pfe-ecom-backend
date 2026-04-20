@@ -1,8 +1,9 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Class1
+namespace pfe.ecom.api.Contracts;
+
+public class UpdateOrderStatusRequest
 {
-	public Class1()
-	{
-	}
+    [Required]
+    public string Status { get; set; } = string.Empty;
 }
