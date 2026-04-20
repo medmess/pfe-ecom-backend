@@ -185,4 +185,29 @@ public class OrderService
 
         return await GetByIdForUserAsync(order.Id, userId);
     }
+
+    public async Task<OrderDto?> UpdateStatusAsync(int id, string status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+            return null;
+
+        var allowedStatuses = new[] { "Pending", "InShipping", "Delivered" };
+
+        var normalizedStatus = allowedStatuses
+            .FirstOrDefault(s => s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (normalizedStatus == null)
+            return null;
+
+        var order = await _context.Orders.FindAsync(id);
+
+        if (order == null)
+            return null;
+
+        order.Status = normalizedStatus;
+
+        await _context.SaveChangesAsync();
+
+        return await GetByIdAsync(id);
+    }
 }

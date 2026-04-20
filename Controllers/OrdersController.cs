@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Customer,Admin")]
+    [Authorize(Roles = "Customer,Supplier,Admin")]
     public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -27,7 +27,7 @@ public class OrdersController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        if (User.IsInRole("Admin"))
+        if (User.IsInRole("Admin") || User.IsInRole("Supplier"))
         {
             var allOrders = await _orderService.GetAllAsync();
             return Ok(allOrders);
@@ -38,7 +38,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Customer,Admin")]
+    [Authorize(Roles = "Customer,Supplier,Admin")]
     public async Task<ActionResult<OrderDto>> GetById(int id)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -48,7 +48,7 @@ public class OrdersController : ControllerBase
 
         OrderDto? order;
 
-        if (User.IsInRole("Admin"))
+        if (User.IsInRole("Admin") || User.IsInRole("Supplier"))
         {
             order = await _orderService.GetByIdAsync(id);
         }
@@ -86,5 +86,25 @@ public class OrdersController : ControllerBase
         }
 
         return CreatedAtAction(nameof(GetById), new { id = createdOrder.Id }, createdOrder);
+    }
+
+    [HttpPut("{id}/status")]
+    [Authorize(Roles = "Supplier,Admin")]
+    public async Task<ActionResult<OrderDto>> UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var updatedOrder = await _orderService.UpdateStatusAsync(id, request.Status);
+
+        if (updatedOrder == null)
+        {
+            return BadRequest(new
+            {
+                message = "Commande introuvable ou statut invalide"
+            });
+        }
+
+        return Ok(updatedOrder);
     }
 }
