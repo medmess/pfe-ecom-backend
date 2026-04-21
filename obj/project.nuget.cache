@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ZMZYeOoHkPY=",
+  "dgSpecHash": "+dR/s28RqlA=",
   "success": true,
   "projectFilePath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\pfe.ecom.api.csproj",
   "expectedPackageFiles": [
@@ -20,7 +20,7 @@
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.6\\microsoft.entityframeworkcore.analyzers.10.0.6.nupkg.sha512",
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.entityframeworkcore.design\\10.0.6\\microsoft.entityframeworkcore.design.10.0.6.nupkg.sha512",
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.6\\microsoft.entityframeworkcore.relational.10.0.6.nupkg.sha512",
-    "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\10.0.3\\microsoft.entityframeworkcore.tools.10.0.3.nupkg.sha512",
+    "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\10.0.6\\microsoft.entityframeworkcore.tools.10.0.6.nupkg.sha512",
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.extensions.apidescription.server\\10.0.0\\microsoft.extensions.apidescription.server.10.0.0.nupkg.sha512",
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.6\\microsoft.extensions.dependencymodel.10.0.6.nupkg.sha512",
     "C:\\Users\\mohamed\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.0.1\\microsoft.identitymodel.abstractions.8.0.1.nupkg.sha512",

@@ -298,4 +298,3 @@ C:\Users\mohamed\source\repos\backend\pfe.ecom.apii\pfe.ecom.api\obj\Debug\net10
 C:\Users\mohamed\source\repos\backend\pfe.ecom.apii\pfe.ecom.api\obj\Debug\net10.0\pfe.ecom.27DC95DF.Up2Date
 C:\Users\mohamed\source\repos\backend\pfe.ecom.apii\pfe.ecom.api\obj\Debug\net10.0\pfe.ecom.api.genruntimeconfig.cache
 C:\Users\mohamed\source\repos\backend\pfe.ecom.apii\pfe.ecom.api\obj\Debug\net10.0\ref\pfe.ecom.api.dll
-C:\Users\mohamed\source\repos\backend\pfe.ecom.apii\pfe.ecom.api\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

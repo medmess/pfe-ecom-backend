@@ -5,8 +5,8 @@
     "\\Controllers",
     "\\data",
     "\\models",
-    "\\Services"
+    "\\obj"
   ],
-  "SelectedNode": "\\Controllers\\OrdersController.cs",
+  "SelectedNode": "\\models\\ApplicationUser.cs",
   "PreviewInSolutionExplorer": false
 }

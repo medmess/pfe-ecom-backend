@@ -16,5 +16,6 @@ public class ApplicationUser : IdentityUser
     public string? Market { get; set; }
     public string? Address { get; set; }
     public string? StoreDescription { get; set; }
+    public string? LogoUrl { get; set; }
     public bool IsVerifiedSupplier { get; set; } = false;
 }

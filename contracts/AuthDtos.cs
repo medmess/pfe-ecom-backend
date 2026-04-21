@@ -14,7 +14,8 @@ public record RegisterRequest(
     string? Wilaya = null,
     string? Market = null,
     string? Address = null,
-    string? StoreDescription = null
+    string? StoreDescription = null,
+    string? LogoUrl = null
 );
 
 public record LoginRequest(
@@ -29,5 +30,36 @@ public record AuthResponse(
     string Role,
     string AccountType,
     string? StoreName,
+    string? StorePhone,
+    string? Wilaya,
+    string? Market,
+    string? Address,
+    string? StoreDescription,
+    string? LogoUrl,
     bool IsVerifiedSupplier
+);
+
+public record SupplierProfileResponse(
+    string Email,
+    string FullName,
+    string AccountType,
+    string? StoreName,
+    string? StorePhone,
+    string? Wilaya,
+    string? Market,
+    string? Address,
+    string? StoreDescription,
+    string? LogoUrl,
+    bool IsVerifiedSupplier
+);
+
+public record UpdateSupplierProfileRequest(
+    [Required, MinLength(3)] string FullName,
+    [Required, MinLength(2)] string StoreName,
+    string? StorePhone,
+    string? Wilaya,
+    string? Market,
+    string? Address,
+    string? StoreDescription,
+    string? LogoUrl
 );

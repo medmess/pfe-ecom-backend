@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pfe.ecom.api.Contracts;
 using pfe.ecom.api.Models;
@@ -76,6 +78,7 @@ public class AuthController : ControllerBase
                 Market = normalizedType == "supplier" ? request.Market?.Trim() : null,
                 Address = normalizedType == "supplier" ? request.Address?.Trim() : null,
                 StoreDescription = normalizedType == "supplier" ? request.StoreDescription?.Trim() : null,
+                LogoUrl = normalizedType == "supplier" ? request.LogoUrl?.Trim() : null,
                 IsVerifiedSupplier = false,
                 EmailConfirmed = true
             };
@@ -156,6 +159,12 @@ public class AuthController : ControllerBase
                 role,
                 user.AccountType,
                 user.StoreName,
+                user.StorePhone,
+                user.Wilaya,
+                user.Market,
+                user.Address,
+                user.StoreDescription,
+                user.LogoUrl,
                 user.IsVerifiedSupplier
             ));
         }
@@ -166,6 +175,112 @@ public class AuthController : ControllerBase
             return StatusCode(500, new
             {
                 message = "An internal server error occurred during login."
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<ActionResult<SupplierProfileResponse>> GetProfile()
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return NotFound("User not found.");
+
+            return Ok(new SupplierProfileResponse(
+                user.Email ?? string.Empty,
+                user.FullName,
+                user.AccountType,
+                user.StoreName,
+                user.StorePhone,
+                user.Wilaya,
+                user.Market,
+                user.Address,
+                user.StoreDescription,
+                user.LogoUrl,
+                user.IsVerifiedSupplier
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while loading profile.");
+
+            return StatusCode(500, new
+            {
+                message = "An internal server error occurred while loading profile."
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<ActionResult<SupplierProfileResponse>> UpdateProfile([FromBody] UpdateSupplierProfileRequest request)
+    {
+        try
+        {
+            if (request == null)
+                return BadRequest("Request body is required.");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return NotFound("User not found.");
+
+            if (!string.Equals(user.AccountType, "supplier", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Only supplier accounts can update supplier profile.");
+            }
+
+            user.FullName = request.FullName.Trim();
+            user.StoreName = request.StoreName.Trim();
+            user.StorePhone = string.IsNullOrWhiteSpace(request.StorePhone) ? null : request.StorePhone.Trim();
+            user.Wilaya = string.IsNullOrWhiteSpace(request.Wilaya) ? null : request.Wilaya.Trim();
+            user.Market = string.IsNullOrWhiteSpace(request.Market) ? null : request.Market.Trim();
+            user.Address = string.IsNullOrWhiteSpace(request.Address) ? null : request.Address.Trim();
+            user.StoreDescription = string.IsNullOrWhiteSpace(request.StoreDescription) ? null : request.StoreDescription.Trim();
+            user.LogoUrl = string.IsNullOrWhiteSpace(request.LogoUrl) ? null : request.LogoUrl.Trim();
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+
+            return Ok(new SupplierProfileResponse(
+                user.Email ?? string.Empty,
+                user.FullName,
+                user.AccountType,
+                user.StoreName,
+                user.StorePhone,
+                user.Wilaya,
+                user.Market,
+                user.Address,
+                user.StoreDescription,
+                user.LogoUrl,
+                user.IsVerifiedSupplier
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while updating supplier profile.");
+
+            return StatusCode(500, new
+            {
+                message = "An internal server error occurred while updating profile."
             });
         }
     }
