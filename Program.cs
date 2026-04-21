@@ -82,12 +82,13 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+// IMPORTANT: allows access to uploaded files in wwwroot/uploads/...
+app.UseStaticFiles();
+
 app.UseCors("frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers();
 
 app.MapControllers();
 
