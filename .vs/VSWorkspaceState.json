@@ -7,6 +7,6 @@
     "\\models",
     "\\Services"
   ],
-  "SelectedNode": "\\Services\\ProductService.cs",
+  "SelectedNode": "\\Controllers\\OrdersController.cs",
   "PreviewInSolutionExplorer": false
 }

@@ -16,36 +16,47 @@ public class OrderService
 
     public async Task<List<OrderDto>> GetAllAsync()
     {
-        return await _context.Orders
-            .AsNoTracking()
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .OrderByDescending(o => o.OrderDate)
-            .Select(o => new OrderDto
-            {
-                Id = o.Id,
-                UserId = o.UserId,
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            })
+        return await BuildOrdersQuery(_context.Orders)
             .ToListAsync();
     }
 
     public async Task<List<OrderDto>> GetForUserAsync(string userId)
     {
-        return await _context.Orders
+        return await BuildOrdersQuery(
+            _context.Orders.Where(o => o.UserId == userId)
+        ).ToListAsync();
+    }
+
+    public async Task<List<OrderDto>> GetForSupplierAsync(string supplierId)
+    {
+        return await BuildOrdersQuery(
+            _context.Orders.Where(o =>
+                o.OrderItems.Any(i =>
+                    i.Product.SupplierId == supplierId))
+        ).ToListAsync();
+    }
+
+    public async Task<OrderDto?> GetByIdAsync(int id)
+    {
+        return await BuildOrdersQuery(
+            _context.Orders.Where(o => o.Id == id)
+        ).FirstOrDefaultAsync();
+    }
+
+    public async Task<OrderDto?> GetByIdForUserAsync(int id, string userId)
+    {
+        return await BuildOrdersQuery(
+            _context.Orders.Where(o =>
+                o.Id == id && o.UserId == userId)
+        ).FirstOrDefaultAsync();
+    }
+
+    private IQueryable<OrderDto> BuildOrdersQuery(IQueryable<Order> query)
+    {
+        return query
             .AsNoTracking()
-            .Where(o => o.UserId == userId)
             .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
+                .ThenInclude(i => i.Product)
             .OrderByDescending(o => o.OrderDate)
             .Select(o => new OrderDto
             {
@@ -54,65 +65,14 @@ public class OrderService
                 OrderDate = o.OrderDate,
                 TotalAmount = o.TotalAmount,
                 Status = o.Status,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
+                Items = o.OrderItems.Select(i => new OrderItemDto
                 {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
+                    ProductId = i.ProductId,
+                    ProductName = i.Product.Name,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
                 }).ToList()
-            })
-            .ToListAsync();
-    }
-
-    public async Task<OrderDto?> GetByIdAsync(int id)
-    {
-        return await _context.Orders
-            .AsNoTracking()
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .Where(o => o.Id == id)
-            .Select(o => new OrderDto
-            {
-                Id = o.Id,
-                UserId = o.UserId,
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            })
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<OrderDto?> GetByIdForUserAsync(int id, string userId)
-    {
-        return await _context.Orders
-            .AsNoTracking()
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .Where(o => o.Id == id && o.UserId == userId)
-            .Select(o => new OrderDto
-            {
-                Id = o.Id,
-                UserId = o.UserId,
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            })
-            .FirstOrDefaultAsync();
+            });
     }
 
     public async Task<OrderDto?> CreateAsync(string userId, CreateOrderRequest request)
@@ -133,10 +93,10 @@ public class OrderService
         if (normalizedItems.Count == 0)
             return null;
 
-        var productIds = normalizedItems.Select(i => i.ProductId).ToList();
+        var ids = normalizedItems.Select(i => i.ProductId).ToList();
 
         var products = await _context.Products
-            .Where(p => productIds.Contains(p.Id))
+            .Where(p => ids.Contains(p.Id))
             .ToDictionaryAsync(p => p.Id);
 
         if (products.Count != normalizedItems.Count)
@@ -144,8 +104,7 @@ public class OrderService
 
         foreach (var item in normalizedItems)
         {
-            if (!products.TryGetValue(item.ProductId, out var product))
-                return null;
+            var product = products[item.ProductId];
 
             if (product.StockQuantity < item.Quantity)
                 return null;
@@ -156,26 +115,25 @@ public class OrderService
             UserId = userId,
             OrderDate = DateTime.UtcNow,
             Status = "Pending",
-            TotalAmount = 0m,
+            TotalAmount = 0,
             OrderItems = new List<OrderItem>()
         };
 
-        decimal total = 0m;
+        decimal total = 0;
 
         foreach (var item in normalizedItems)
         {
             var product = products[item.ProductId];
 
-            var orderItem = new OrderItem
+            order.OrderItems.Add(new OrderItem
             {
                 ProductId = product.Id,
                 Quantity = item.Quantity,
                 UnitPrice = product.Price
-            };
+            });
 
             total += product.Price * item.Quantity;
             product.StockQuantity -= item.Quantity;
-            order.OrderItems.Add(orderItem);
         }
 
         order.TotalAmount = total;
@@ -191,12 +149,12 @@ public class OrderService
         if (string.IsNullOrWhiteSpace(status))
             return null;
 
-        var allowedStatuses = new[] { "Pending", "InShipping", "Delivered" };
+        var allowed = new[] { "Pending", "Processing", "Delivered" };
 
-        var normalizedStatus = allowedStatuses
-            .FirstOrDefault(s => s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
+        var normalized = allowed.FirstOrDefault(s =>
+            s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
 
-        if (normalizedStatus == null)
+        if (normalized == null)
             return null;
 
         var order = await _context.Orders.FindAsync(id);
@@ -204,7 +162,7 @@ public class OrderService
         if (order == null)
             return null;
 
-        order.Status = normalizedStatus;
+        order.Status = normalized;
 
         await _context.SaveChangesAsync();
 

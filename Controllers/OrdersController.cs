@@ -27,10 +27,14 @@ public class OrdersController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        if (User.IsInRole("Admin") || User.IsInRole("Supplier"))
+        if (User.IsInRole("Admin"))
         {
-            var allOrders = await _orderService.GetAllAsync();
-            return Ok(allOrders);
+            return Ok(await _orderService.GetAllAsync());
+        }
+
+        if (User.IsInRole("Supplier"))
+        {
+            return Ok(await _orderService.GetForSupplierAsync(userId));
         }
 
         var userOrders = await _orderService.GetForUserAsync(userId);

@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controllers\\OrdersController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\OrderService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\ProductService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -47,14 +55,6 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:contracts\\UpdateOrderStatusRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controllers\\OrdersController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\OrderService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\models\\Order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:models\\Order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -87,32 +87,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "CreateProductRequest.cs",
-              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\CreateProductRequest.cs",
-              "RelativeDocumentMoniker": "contracts\\CreateProductRequest.cs",
-              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\CreateProductRequest.cs",
-              "RelativeToolTip": "contracts\\CreateProductRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T20:02:56.804Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "UpdateProductRequest.cs",
-              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\UpdateProductRequest.cs",
-              "RelativeDocumentMoniker": "contracts\\UpdateProductRequest.cs",
-              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\UpdateProductRequest.cs",
-              "RelativeToolTip": "contracts\\UpdateProductRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-21T01:50:43.205Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
               "Title": "ProductService.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\ProductService.cs",
               "RelativeDocumentMoniker": "Services\\ProductService.cs",
@@ -125,7 +99,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "ProductsController.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\ProductsController.cs",
               "RelativeDocumentMoniker": "Controllers\\ProductsController.cs",
@@ -133,12 +107,61 @@
               "RelativeToolTip": "Controllers\\ProductsController.cs",
               "ViewState": "AgIAAFQAAAAAAAAAAAAswGYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T17:46:15.569Z",
+              "WhenOpened": "2026-04-20T17:46:15.569Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "OrdersController.cs",
+              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs",
+              "RelativeDocumentMoniker": "Controllers\\OrdersController.cs",
+              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs",
+              "RelativeToolTip": "Controllers\\OrdersController.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAAACUAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-20T19:53:08.21Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "OrderService.cs",
+              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs",
+              "RelativeDocumentMoniker": "Services\\OrderService.cs",
+              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs",
+              "RelativeToolTip": "Services\\OrderService.cs",
+              "ViewState": "AgIAAJgAAAAAAAAAAAAswKoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-20T19:54:05.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UpdateProductRequest.cs",
+              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\UpdateProductRequest.cs",
+              "RelativeDocumentMoniker": "contracts\\UpdateProductRequest.cs",
+              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\UpdateProductRequest.cs",
+              "RelativeToolTip": "contracts\\UpdateProductRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-21T01:50:43.205Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 4,
+              "Title": "CreateProductRequest.cs",
+              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\CreateProductRequest.cs",
+              "RelativeDocumentMoniker": "contracts\\CreateProductRequest.cs",
+              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\CreateProductRequest.cs",
+              "RelativeToolTip": "contracts\\CreateProductRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-20T20:02:56.804Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "product.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\models\\product.cs",
               "RelativeDocumentMoniker": "models\\product.cs",
@@ -146,12 +169,11 @@
               "RelativeToolTip": "models\\product.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T17:46:51.28Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-20T17:46:51.28Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -163,7 +185,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
@@ -175,7 +197,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "JwtTokenService.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\JwtTokenService.cs",
               "RelativeDocumentMoniker": "Services\\JwtTokenService.cs",
@@ -187,7 +209,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "CreateOrderRequest.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\CreateOrderRequest.cs",
               "RelativeDocumentMoniker": "contracts\\CreateOrderRequest.cs",
@@ -199,7 +221,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "ProductDto.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\ProductDto.cs",
               "RelativeDocumentMoniker": "contracts\\ProductDto.cs",
@@ -211,7 +233,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "UpdateOrderStatusRequest.cs",
               "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\contracts\\UpdateOrderStatusRequest.cs",
               "RelativeDocumentMoniker": "contracts\\UpdateOrderStatusRequest.cs",
@@ -220,30 +242,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-20T20:02:21.069Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "OrdersController.cs",
-              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs",
-              "RelativeDocumentMoniker": "Controllers\\OrdersController.cs",
-              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Controllers\\OrdersController.cs",
-              "RelativeToolTip": "Controllers\\OrdersController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T19:53:08.21Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "OrderService.cs",
-              "DocumentMoniker": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs",
-              "RelativeDocumentMoniker": "Services\\OrderService.cs",
-              "ToolTip": "C:\\Users\\mohamed\\source\\repos\\backend\\pfe.ecom.apii\\pfe.ecom.api\\Services\\OrderService.cs",
-              "RelativeToolTip": "Services\\OrderService.cs",
-              "ViewState": "AgIAAMIAAAAAAAAAAAAswNQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-20T19:54:05.005Z"
             },
             {
               "$type": "Document",
