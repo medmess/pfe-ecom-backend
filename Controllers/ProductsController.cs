@@ -39,7 +39,7 @@ namespace pfe.ecom.api.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Supplier,Admin")]
-        public async Task<ActionResult<ProductDto>> Create([FromForm] CreateProductRequest request)
+        public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductRequest request)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
@@ -61,7 +61,7 @@ namespace pfe.ecom.api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Supplier,Admin")]
-        public async Task<IActionResult> Update(int id, [FromForm] UpdateProductRequest request)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequest request)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);

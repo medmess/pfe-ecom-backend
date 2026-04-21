@@ -8,12 +8,10 @@ namespace pfe.ecom.api.Services;
 public class ProductService
 {
     private readonly AppDbContext _context;
-    private readonly IWebHostEnvironment _environment;
 
-    public ProductService(AppDbContext context, IWebHostEnvironment environment)
+    public ProductService(AppDbContext context)
     {
         _context = context;
-        _environment = environment;
     }
 
     public async Task<List<ProductDto>> GetAllAsync()
@@ -55,8 +53,6 @@ public class ProductService
 
     public async Task<ProductDto?> CreateAsync(CreateProductRequest request, string userId, bool isAdmin)
     {
-        var finalImageUrl = await ResolveImageAsync(request.ImageUrl, request.ImageFile);
-
         var product = new Product
         {
             Name = request.Name ?? string.Empty,
@@ -65,7 +61,7 @@ public class ProductService
             Category = request.Category ?? string.Empty,
             Price = request.Price,
             StockQuantity = request.StockQuantity,
-            ImageUrl = finalImageUrl ?? string.Empty,
+            ImageUrl = request.ImageUrl ?? string.Empty,
             SupplierId = isAdmin ? null : userId
         };
 
@@ -101,13 +97,7 @@ public class ProductService
         product.Category = request.Category ?? string.Empty;
         product.Price = request.Price;
         product.StockQuantity = request.StockQuantity;
-
-        // update image only if a new file or new URL was provided
-        if (request.ImageFile != null || !string.IsNullOrWhiteSpace(request.ImageUrl))
-        {
-            var finalImageUrl = await ResolveImageAsync(request.ImageUrl, request.ImageFile);
-            product.ImageUrl = finalImageUrl ?? string.Empty;
-        }
+        product.ImageUrl = request.ImageUrl ?? string.Empty;
 
         await _context.SaveChangesAsync();
         return true;
@@ -126,46 +116,5 @@ public class ProductService
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
         return true;
-    }
-
-    private async Task<string?> ResolveImageAsync(string? imageUrl, IFormFile? imageFile)
-    {
-        if (imageFile != null && imageFile.Length > 0)
-        {
-            return await SaveImageAsync(imageFile);
-        }
-
-        if (!string.IsNullOrWhiteSpace(imageUrl))
-        {
-            return imageUrl.Trim();
-        }
-
-        return null;
-    }
-
-    private async Task<string> SaveImageAsync(IFormFile file)
-    {
-        var webRootPath = _environment.WebRootPath;
-
-        if (string.IsNullOrWhiteSpace(webRootPath))
-        {
-            webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-        }
-
-        var uploadsFolder = Path.Combine(webRootPath, "uploads", "products");
-
-        if (!Directory.Exists(uploadsFolder))
-        {
-            Directory.CreateDirectory(uploadsFolder);
-        }
-
-        var extension = Path.GetExtension(file.FileName);
-        var fileName = $"{Guid.NewGuid()}{extension}";
-        var fullPath = Path.Combine(uploadsFolder, fileName);
-
-        using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
-
-        return $"/uploads/products/{fileName}";
     }
 }
