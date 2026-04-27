@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<parameters>
-  <parameter name="IIS Web Application Name" description="" value="site63378" tags="IisApp">
-    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\mohamed\\source\\repos\\backend\\pfe\.ecom\.api\\pfe\.ecom\.api\\obj\\Release\\net10\.0\\PubTmp\\Out\\$" />
-  </parameter>
-  <parameter name="pfe.ecom.api.Data.AppDbContext" description="" value="Server=db47824.databaseasp.net,1433;Database=db47824;User Id=db47824;Password=YOUR_REAL_PASSWORD;Encrypt=False;MultipleActiveResultSets=True;TrustServerCertificate=True" tags="dbfullsql">
-    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^C:\\Users\\mohamed\\source\\repos\\backend\\pfe\.ecom\.api\\pfe\.ecom\.api\\obj\\Release\\net10\.0\\PubTmp\\EFSQLScripts\\pfe\.ecom\.api\.Data\.AppDbContext\.sql$" />
-  </parameter>
-</parameters>

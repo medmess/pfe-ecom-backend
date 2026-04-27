@@ -1,5 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<sitemanifest>
-  <IisApp path="C:\Users\mohamed\source\repos\backend\pfe.ecom.api\pfe.ecom.api\obj\Release\net10.0\PubTmp\Out\" />
-  <dbfullsql path="C:\Users\mohamed\source\repos\backend\pfe.ecom.api\pfe.ecom.api\obj\Release\net10.0\PubTmp\EFSQLScripts\pfe.ecom.api.Data.AppDbContext.sql" />
-</sitemanifest>
