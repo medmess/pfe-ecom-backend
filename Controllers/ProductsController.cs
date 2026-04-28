@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pfe.ecom.api.Contracts;
@@ -24,8 +24,19 @@ namespace pfe.ecom.api.Controllers
             var products = await _productService.GetAllAsync();
             return Ok(products);
         }
+    [HttpGet("mine")]
+    [Authorize(Roles = "Supplier,Admin")]
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetMine()
+    {
+      var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        [HttpGet("{id}")]
+      if (string.IsNullOrEmpty(userId))
+        return Unauthorized();
+
+      var products = await _productService.GetMineAsync(userId);
+      return Ok(products);
+    }
+    [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<ProductDto>> GetById(int id)
         {

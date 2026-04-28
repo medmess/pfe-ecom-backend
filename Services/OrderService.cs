@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using pfe.ecom.api.Contracts;
 using pfe.ecom.api.Data;
 using pfe.ecom.api.Models;
@@ -7,165 +7,238 @@ namespace pfe.ecom.api.Services;
 
 public class OrderService
 {
-    private readonly AppDbContext _context;
+  private readonly AppDbContext _context;
 
-    public OrderService(AppDbContext context)
-    {
-        _context = context;
-    }
+  public OrderService(AppDbContext context)
+  {
+    _context = context;
+  }
 
-    public async Task<List<OrderDto>> GetAllAsync()
-    {
-        return await BuildOrdersQuery(_context.Orders)
-            .ToListAsync();
-    }
+  public async Task<List<OrderDto>> GetAllAsync()
+  {
+    return await BuildOrdersQuery(_context.Orders).ToListAsync();
+  }
 
-    public async Task<List<OrderDto>> GetForUserAsync(string userId)
-    {
-        return await BuildOrdersQuery(
-            _context.Orders.Where(o => o.UserId == userId)
-        ).ToListAsync();
-    }
+  public async Task<List<OrderDto>> GetForUserAsync(string userId)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o => o.UserId == userId)
+    ).ToListAsync();
+  }
 
-    public async Task<List<OrderDto>> GetForSupplierAsync(string supplierId)
-    {
-        return await BuildOrdersQuery(
-            _context.Orders.Where(o =>
-                o.OrderItems.Any(i =>
-                    i.Product.SupplierId == supplierId))
-        ).ToListAsync();
-    }
+  public async Task<List<OrderDto>> GetForSupplierAsync(string supplierId)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.OrderItems.Any(i => i.Product.SupplierId == supplierId))
+    ).ToListAsync();
+  }
 
-    public async Task<OrderDto?> GetByIdAsync(int id)
-    {
-        return await BuildOrdersQuery(
-            _context.Orders.Where(o => o.Id == id)
-        ).FirstOrDefaultAsync();
-    }
+  public async Task<OrderDto?> GetByIdAsync(int id)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o => o.Id == id)
+    ).FirstOrDefaultAsync();
+  }
 
-    public async Task<OrderDto?> GetByIdForUserAsync(int id, string userId)
-    {
-        return await BuildOrdersQuery(
-            _context.Orders.Where(o =>
-                o.Id == id && o.UserId == userId)
-        ).FirstOrDefaultAsync();
-    }
+  public async Task<OrderDto?> GetByIdForUserAsync(int id, string userId)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.Id == id && o.UserId == userId)
+    ).FirstOrDefaultAsync();
+  }
 
-    private IQueryable<OrderDto> BuildOrdersQuery(IQueryable<Order> query)
-    {
-        return query
-            .AsNoTracking()
-            .Include(o => o.OrderItems)
-                .ThenInclude(i => i.Product)
-            .OrderByDescending(o => o.OrderDate)
-            .Select(o => new OrderDto
-            {
-                Id = o.Id,
-                UserId = o.UserId,
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status,
-                Items = o.OrderItems.Select(i => new OrderItemDto
-                {
-                    ProductId = i.ProductId,
-                    ProductName = i.Product.Name,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
-                }).ToList()
-            });
-    }
+  public async Task<OrderDto?> GetByIdForSupplierAsync(int id, string supplierId)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.Id == id &&
+            o.OrderItems.Any(i => i.Product.SupplierId == supplierId))
+    ).FirstOrDefaultAsync();
+  }
 
-    public async Task<OrderDto?> CreateAsync(string userId, CreateOrderRequest request)
-    {
-        if (request.Items == null || request.Items.Count == 0)
-            return null;
-
-        var normalizedItems = request.Items
-            .Where(i => i.ProductId > 0 && i.Quantity > 0)
-            .GroupBy(i => i.ProductId)
-            .Select(g => new
-            {
-                ProductId = g.Key,
-                Quantity = g.Sum(x => x.Quantity)
-            })
-            .ToList();
-
-        if (normalizedItems.Count == 0)
-            return null;
-
-        var ids = normalizedItems.Select(i => i.ProductId).ToList();
-
-        var products = await _context.Products
-            .Where(p => ids.Contains(p.Id))
-            .ToDictionaryAsync(p => p.Id);
-
-        if (products.Count != normalizedItems.Count)
-            return null;
-
-        foreach (var item in normalizedItems)
+  private IQueryable<OrderDto> BuildOrdersQuery(IQueryable<Order> query)
+  {
+    return query
+        .AsNoTracking()
+        .Include(o => o.OrderItems)
+            .ThenInclude(i => i.Product)
+        .OrderByDescending(o => o.OrderDate)
+        .Select(o => new OrderDto
         {
-            var product = products[item.ProductId];
+          Id = o.Id,
+          UserId = o.UserId,
+          OrderDate = o.OrderDate,
+          TotalAmount = o.TotalAmount,
+          Status = o.Status,
+          CancelledAt = o.CancelledAt,
+          CancelReason = o.CancelReason,
+          ReturnRequestedAt = o.ReturnRequestedAt,
+          ReturnReason = o.ReturnReason,
+          Items = o.OrderItems.Select(i => new OrderItemDto
+          {
+            ProductId = i.ProductId,
+            ProductName = i.Product.Name,
+            Quantity = i.Quantity,
+            UnitPrice = i.UnitPrice
+          }).ToList()
+        });
+  }
 
-            if (product.StockQuantity < item.Quantity)
-                return null;
-        }
+  public async Task<OrderDto?> CreateAsync(string userId, CreateOrderRequest request)
+  {
+    if (request.Items == null || request.Items.Count == 0)
+      return null;
 
-        var order = new Order
+    var normalizedItems = request.Items
+        .Where(i => i.ProductId > 0 && i.Quantity > 0)
+        .GroupBy(i => i.ProductId)
+        .Select(g => new
         {
-            UserId = userId,
-            OrderDate = DateTime.UtcNow,
-            Status = "Pending",
-            TotalAmount = 0,
-            OrderItems = new List<OrderItem>()
-        };
+          ProductId = g.Key,
+          Quantity = g.Sum(x => x.Quantity)
+        })
+        .ToList();
 
-        decimal total = 0;
+    if (normalizedItems.Count == 0)
+      return null;
 
-        foreach (var item in normalizedItems)
-        {
-            var product = products[item.ProductId];
+    var ids = normalizedItems.Select(i => i.ProductId).ToList();
 
-            order.OrderItems.Add(new OrderItem
-            {
-                ProductId = product.Id,
-                Quantity = item.Quantity,
-                UnitPrice = product.Price
-            });
+    var products = await _context.Products
+        .Where(p => ids.Contains(p.Id))
+        .ToDictionaryAsync(p => p.Id);
 
-            total += product.Price * item.Quantity;
-            product.StockQuantity -= item.Quantity;
-        }
+    if (products.Count != normalizedItems.Count)
+      return null;
 
-        order.TotalAmount = total;
-
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
-
-        return await GetByIdForUserAsync(order.Id, userId);
-    }
-
-    public async Task<OrderDto?> UpdateStatusAsync(int id, string status)
+    foreach (var item in normalizedItems)
     {
-        if (string.IsNullOrWhiteSpace(status))
-            return null;
+      var product = products[item.ProductId];
 
-        var allowed = new[] { "Pending", "Processing", "Delivered" };
-
-        var normalized = allowed.FirstOrDefault(s =>
-            s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
-
-        if (normalized == null)
-            return null;
-
-        var order = await _context.Orders.FindAsync(id);
-
-        if (order == null)
-            return null;
-
-        order.Status = normalized;
-
-        await _context.SaveChangesAsync();
-
-        return await GetByIdAsync(id);
+      if (product.StockQuantity < item.Quantity)
+        return null;
     }
+
+    var order = new Order
+    {
+      UserId = userId,
+      OrderDate = DateTime.UtcNow,
+      Status = "Pending",
+      TotalAmount = 0,
+      OrderItems = new List<OrderItem>()
+    };
+
+    decimal total = 0;
+
+    foreach (var item in normalizedItems)
+    {
+      var product = products[item.ProductId];
+
+      order.OrderItems.Add(new OrderItem
+      {
+        ProductId = product.Id,
+        Quantity = item.Quantity,
+        UnitPrice = product.Price
+      });
+
+      total += product.Price * item.Quantity;
+      product.StockQuantity -= item.Quantity;
+    }
+
+    order.TotalAmount = total;
+
+    _context.Orders.Add(order);
+    await _context.SaveChangesAsync();
+
+    return await GetByIdForUserAsync(order.Id, userId);
+  }
+
+  public async Task<OrderDto?> UpdateStatusAsync(int id, string status, string supplierId)
+  {
+    if (string.IsNullOrWhiteSpace(status))
+      return null;
+
+    var allowed = new[]
+    {
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Cancelled",
+      "ReturnRequested",
+      "Returned",
+      "ReturnRejected"
+    };
+
+    var normalized = allowed.FirstOrDefault(s =>
+        s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    if (normalized == null)
+      return null;
+
+    var order = await _context.Orders
+        .Include(o => o.OrderItems)
+            .ThenInclude(i => i.Product)
+        .FirstOrDefaultAsync(o =>
+            o.Id == id &&
+            o.OrderItems.Any(i => i.Product.SupplierId == supplierId));
+
+    if (order == null)
+      return null;
+
+    order.Status = normalized;
+
+    await _context.SaveChangesAsync();
+
+    return await GetByIdForSupplierAsync(id, supplierId);
+  }
+
+  public async Task<OrderDto?> CancelOrderAsync(int id, string userId, string? reason)
+  {
+    var order = await _context.Orders
+        .Include(o => o.OrderItems)
+            .ThenInclude(i => i.Product)
+        .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+
+    if (order == null)
+      return null;
+
+    if (order.Status != "Pending" && order.Status != "Processing")
+      return null;
+
+    order.Status = "Cancelled";
+    order.CancelledAt = DateTime.UtcNow;
+    order.CancelReason = reason;
+
+    foreach (var item in order.OrderItems)
+    {
+      item.Product.StockQuantity += item.Quantity;
+    }
+
+    await _context.SaveChangesAsync();
+
+    return await GetByIdForUserAsync(id, userId);
+  }
+
+  public async Task<OrderDto?> RequestReturnAsync(int id, string userId, string? reason)
+  {
+    var order = await _context.Orders
+        .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+
+    if (order == null)
+      return null;
+
+    if (order.Status != "Delivered")
+      return null;
+
+    order.Status = "ReturnRequested";
+    order.ReturnRequestedAt = DateTime.UtcNow;
+    order.ReturnReason = reason;
+
+    await _context.SaveChangesAsync();
+
+    return await GetByIdForUserAsync(id, userId);
+  }
 }
