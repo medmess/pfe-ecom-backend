@@ -5,24 +5,25 @@
 namespace pfe.ecom.api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSupplierLogoUrl : Migration
+    public partial class AddDiscountPercent : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "LogoUrl",
-                table: "AspNetUsers",
-                type: "text",
-                nullable: true);
+            migrationBuilder.AddColumn<int>(
+                name: "DiscountPercent",
+                table: "Products",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "LogoUrl",
-                table: "AspNetUsers");
+                name: "DiscountPercent",
+                table: "Products");
         }
     }
 }

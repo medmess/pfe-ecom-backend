@@ -43,10 +43,10 @@ public class ProductService
       Brand = request.Brand ?? string.Empty,
       Category = request.Category ?? string.Empty,
       Price = request.Price,
+      DiscountPercent = request.DiscountPercent,
       StockQuantity = request.StockQuantity,
       ImageUrl = request.ImageUrl ?? string.Empty,
 
-      // Admin and supplier both own their own products
       SupplierId = userId
     };
 
@@ -63,7 +63,6 @@ public class ProductService
     if (product == null)
       return false;
 
-    // Admin can edit only his own products, not other sellers' products
     if (product.SupplierId != userId)
       return false;
 
@@ -72,6 +71,7 @@ public class ProductService
     product.Brand = request.Brand ?? string.Empty;
     product.Category = request.Category ?? string.Empty;
     product.Price = request.Price;
+    product.DiscountPercent = request.DiscountPercent;
     product.StockQuantity = request.StockQuantity;
     product.ImageUrl = request.ImageUrl ?? string.Empty;
 
@@ -86,8 +86,6 @@ public class ProductService
     if (product == null)
       return false;
 
-    // Admin can delete only his own products here
-    // Deleting seller accounts should be handled in UsersController
     if (product.SupplierId != userId)
       return false;
 
@@ -108,6 +106,7 @@ public class ProductService
           Brand = p.Brand,
           Category = p.Category,
           Price = p.Price,
+          DiscountPercent = p.DiscountPercent,
           StockQuantity = p.StockQuantity,
           ImageUrl = p.ImageUrl
         });

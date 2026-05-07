@@ -10,18 +10,37 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // DB
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Database connection string is missing.");
+
+var databaseProvider = builder.Configuration["DatabaseProvider"]
+    ?? throw new InvalidOperationException("Database provider is missing.");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+  if (databaseProvider == "SqlServer")
+  {
+    options.UseSqlServer(connectionString);
+  }
+  else if (databaseProvider == "Postgres")
+  {
+    options.UseNpgsql(connectionString);
+  }
+  else
+  {
+    throw new InvalidOperationException("Invalid database provider. Use 'SqlServer' or 'Postgres'.");
+  }
+});
 
 // Identity
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
 {
-    options.Password.RequiredLength = 8;
-    options.Password.RequireDigit = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.User.RequireUniqueEmail = true;
+  options.Password.RequiredLength = 8;
+  options.Password.RequireDigit = false;
+  options.Password.RequireUppercase = false;
+  options.Password.RequireLowercase = false;
+  options.Password.RequireNonAlphanumeric = false;
+  options.User.RequireUniqueEmail = true;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>()
@@ -38,17 +57,17 @@ var jwtIssuer = builder.Configuration["Jwt:Issuer"]
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = jwtIssuer,
-            ValidateAudience = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-            RoleClaimType = System.Security.Claims.ClaimTypes.Role
-        };
+      options.TokenValidationParameters = new TokenValidationParameters
+      {
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role
+      };
     });
 
 builder.Services.AddAuthorization();
@@ -56,13 +75,13 @@ builder.Services.AddAuthorization();
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("frontend", policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+  options.AddPolicy("frontend", policy =>
+  {
+    policy
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+  });
 });
 
 // Services
@@ -82,7 +101,7 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// IMPORTANT: allows access to uploaded files in wwwroot/uploads/...
+// Allows access to uploaded files in wwwroot/uploads/...
 app.UseStaticFiles();
 
 app.UseCors("frontend");
@@ -94,8 +113,8 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    await DbSeeder.SeedAsync(services);
+  var services = scope.ServiceProvider;
+  await DbSeeder.SeedAsync(services);
 }
 
 app.Run();
