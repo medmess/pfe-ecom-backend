@@ -1,11 +1,11 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pfe.ecom.api.Contracts;
 using pfe.ecom.api.Models;
 using pfe.ecom.api.Services;
-
+// JWT Authentication Controller
 namespace pfe.ecom.api.Controllers;
 
 [ApiController]
