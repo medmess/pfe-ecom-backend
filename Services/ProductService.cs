@@ -108,7 +108,11 @@ public class ProductService
           Price = p.Price,
           DiscountPercent = p.DiscountPercent,
           StockQuantity = p.StockQuantity,
-          ImageUrl = p.ImageUrl
+          ImageUrl = p.ImageUrl,
+          StoreName = p.Supplier != null
+              ? (!string.IsNullOrWhiteSpace(p.Supplier.StoreName) ? p.Supplier.StoreName : p.Supplier.FullName)
+              : null,
+          StoreLogoUrl = p.Supplier != null ? p.Supplier.LogoUrl : null
         });
   }
 }

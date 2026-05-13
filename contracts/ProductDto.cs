@@ -19,4 +19,8 @@ public class ProductDto
   public int StockQuantity { get; set; }
 
   public string? ImageUrl { get; set; }
+
+  public string? StoreName { get; set; }
+
+  public string? StoreLogoUrl { get; set; }
 }
