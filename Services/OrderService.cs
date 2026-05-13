@@ -64,6 +64,7 @@ public class OrderService
         .AsNoTracking()
         .Include(o => o.OrderItems)
             .ThenInclude(i => i.Product)
+        .Include(o => o.ShippingInfo)
         .OrderByDescending(o => o.OrderDate)
         .Select(o => new OrderDto
         {
@@ -71,11 +72,23 @@ public class OrderService
           UserId = o.UserId,
           OrderDate = o.OrderDate,
           TotalAmount = o.TotalAmount,
-          Status = o.Status,
+          Status = o.Status == "ReturnRequested" ? "Returned" : o.Status,
           CancelledAt = o.CancelledAt,
           CancelReason = o.CancelReason,
           ReturnRequestedAt = o.ReturnRequestedAt,
           ReturnReason = o.ReturnReason,
+          ShippingInfo = o.ShippingInfo == null ? null : new ShippingInfoDto
+          {
+            FullName = o.ShippingInfo.FullName,
+            Phone = o.ShippingInfo.Phone,
+            Wilaya = o.ShippingInfo.Wilaya,
+            Address = o.ShippingInfo.Address,
+            Notes = o.ShippingInfo.Notes,
+            AddressChoice = o.ShippingInfo.AddressChoice,
+            DeliveryService = o.ShippingInfo.DeliveryService,
+            DeliveryMode = o.ShippingInfo.DeliveryMode,
+            AgencySite = o.ShippingInfo.AgencySite
+          },
           Items = o.OrderItems.Select(i => new OrderItemDto
           {
             ProductId = i.ProductId,
@@ -127,7 +140,8 @@ public class OrderService
       OrderDate = DateTime.UtcNow,
       Status = "Pending",
       TotalAmount = 0,
-      OrderItems = new List<OrderItem>()
+      OrderItems = new List<OrderItem>(),
+      ShippingInfo = BuildShippingInfo(request.ShippingInfo)
     };
 
     decimal total = 0;
@@ -155,6 +169,31 @@ public class OrderService
     return await GetByIdForUserAsync(order.Id, userId);
   }
 
+  private static OrderShippingInfo? BuildShippingInfo(ShippingInfoDto? shipping)
+  {
+    if (shipping == null)
+      return null;
+
+    return new OrderShippingInfo
+    {
+      FullName = Normalize(shipping.FullName),
+      Phone = Normalize(shipping.Phone),
+      Wilaya = Normalize(shipping.Wilaya),
+      Address = Normalize(shipping.Address),
+      Notes = Normalize(shipping.Notes),
+      AddressChoice = Normalize(shipping.AddressChoice),
+      DeliveryService = Normalize(shipping.DeliveryService),
+      DeliveryMode = Normalize(shipping.DeliveryMode),
+      AgencySite = Normalize(shipping.AgencySite),
+      CreatedAt = DateTime.UtcNow
+    };
+  }
+
+  private static string? Normalize(string? value)
+  {
+    return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+  }
+
   public async Task<OrderDto?> UpdateStatusAsync(int id, string status, string supplierId)
   {
     if (string.IsNullOrWhiteSpace(status))
@@ -167,7 +206,6 @@ public class OrderService
       "Shipped",
       "Delivered",
       "Cancelled",
-      "ReturnRequested",
       "Returned",
       "ReturnRejected"
     };
@@ -233,7 +271,7 @@ public class OrderService
     if (order.Status != "Delivered")
       return null;
 
-    order.Status = "ReturnRequested";
+    order.Status = "Returned";
     order.ReturnRequestedAt = DateTime.UtcNow;
     order.ReturnReason = reason;
 

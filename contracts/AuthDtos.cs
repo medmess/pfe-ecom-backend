@@ -63,3 +63,8 @@ public record UpdateSupplierProfileRequest(
     string? StoreDescription,
     string? LogoUrl
 );
+
+public record UpdateCustomerProfileRequest(
+    [Required, MinLength(3)] string FullName,
+    string? Address
+);

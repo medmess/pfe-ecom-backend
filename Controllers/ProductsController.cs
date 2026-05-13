@@ -70,6 +70,42 @@ namespace pfe.ecom.api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
         }
 
+        [HttpPost("upload")]
+        [Authorize(Roles = "Supplier,Admin")]
+        public async Task<ActionResult<ProductDto>> CreateWithImage([FromForm] ProductFormRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var imageUrl = SaveProductImageAsync(request.Image);
+            if (imageUrl == InvalidImageMessage)
+                return BadRequest(new { message = InvalidImageMessage });
+
+            var createRequest = new CreateProductRequest
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Brand = request.Brand,
+                Category = request.Category,
+                Price = request.Price,
+                DiscountPercent = request.DiscountPercent,
+                StockQuantity = request.StockQuantity,
+                ImageUrl = imageUrl ?? request.ImageUrl
+            };
+
+            var createdProduct = await _productService.CreateAsync(createRequest, userId, User.IsInRole("Admin"));
+
+            if (createdProduct == null)
+                return BadRequest(new { message = "Impossible de crÃ©er le produit" });
+
+            return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
+        }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Supplier,Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequest request)
@@ -92,6 +128,43 @@ namespace pfe.ecom.api.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/upload")]
+        [Authorize(Roles = "Supplier,Admin")]
+        public async Task<ActionResult<ProductDto>> UpdateWithImage(int id, [FromForm] ProductFormRequest request)
+        {
+            if (!ModelState.IsValid)
+                return ValidationProblem(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var imageUrl = SaveProductImageAsync(request.Image);
+            if (imageUrl == InvalidImageMessage)
+                return BadRequest(new { message = InvalidImageMessage });
+
+            var updateRequest = new UpdateProductRequest
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Brand = request.Brand,
+                Category = request.Category,
+                Price = request.Price,
+                DiscountPercent = request.DiscountPercent,
+                StockQuantity = request.StockQuantity,
+                ImageUrl = imageUrl ?? request.ImageUrl
+            };
+
+            var updated = await _productService.UpdateAsync(id, updateRequest, userId, User.IsInRole("Admin"));
+
+            if (!updated)
+                return NotFound(new { message = "Produit introuvable ou accÃ¨s refusÃ©" });
+
+            var product = await _productService.GetByIdAsync(id);
+            return Ok(product);
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Supplier,Admin")]
         public async Task<IActionResult> Delete(int id)
@@ -109,6 +182,31 @@ namespace pfe.ecom.api.Controllers
                 return NotFound(new { message = "Produit introuvable ou accès refusé" });
 
             return NoContent();
+        }
+
+        private const string InvalidImageMessage = "Only image files are allowed.";
+
+        private string? SaveProductImageAsync(IFormFile? image)
+        {
+            if (image == null || image.Length == 0)
+                return null;
+
+            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+
+            if (!allowedExtensions.Contains(extension))
+                return InvalidImageMessage;
+
+            var uploadRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
+            Directory.CreateDirectory(uploadRoot);
+
+            var fileName = $"{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(uploadRoot, fileName);
+
+            using var stream = System.IO.File.Create(filePath);
+            image.CopyTo(stream);
+
+            return $"{Request.Scheme}://{Request.Host}/uploads/products/{fileName}";
         }
     }
 }

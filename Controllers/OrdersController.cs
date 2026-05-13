@@ -27,7 +27,12 @@ public class OrdersController : ControllerBase
     if (string.IsNullOrEmpty(userId))
       return Unauthorized();
 
-    if (User.IsInRole("Supplier") || User.IsInRole("Admin"))
+    if (User.IsInRole("Admin"))
+    {
+      return Ok(await _orderService.GetAllAsync());
+    }
+
+    if (User.IsInRole("Supplier"))
     {
       return Ok(await _orderService.GetForSupplierAsync(userId));
     }
@@ -46,7 +51,11 @@ public class OrdersController : ControllerBase
 
     OrderDto? order;
 
-    if (User.IsInRole("Supplier") || User.IsInRole("Admin"))
+    if (User.IsInRole("Admin"))
+    {
+      order = await _orderService.GetByIdAsync(id);
+    }
+    else if (User.IsInRole("Supplier"))
     {
       order = await _orderService.GetByIdForSupplierAsync(id, userId);
     }
@@ -137,6 +146,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpPut("{id}/return-request")]
+  [HttpPut("{id}/return")]
   [Authorize(Roles = "Customer")]
   public async Task<ActionResult<OrderDto>> RequestReturn(int id, [FromBody] OrderActionRequest request)
   {

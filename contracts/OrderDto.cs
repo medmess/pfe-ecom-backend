@@ -20,5 +20,7 @@ public class OrderDto
 
   public string? ReturnReason { get; set; }
 
+  public ShippingInfoDto? ShippingInfo { get; set; }
+
   public List<OrderItemDto> Items { get; set; } = new();
 }

@@ -14,6 +14,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
   public DbSet<Product> Products { get; set; }
   public DbSet<Order> Orders { get; set; }
   public DbSet<OrderItem> OrderItems { get; set; }
+  public DbSet<OrderShippingInfo> OrderShippingInfos { get; set; }
   public DbSet<Payment> Payments { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
@@ -47,5 +48,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         .WithOne(p => p.Order)
         .HasForeignKey<Payment>(p => p.OrderId)
         .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<Order>()
+        .HasOne(o => o.ShippingInfo)
+        .WithOne(s => s.Order)
+        .HasForeignKey<OrderShippingInfo>(s => s.OrderId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<OrderShippingInfo>()
+        .HasIndex(s => s.OrderId)
+        .IsUnique();
   }
 }

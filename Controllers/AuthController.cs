@@ -76,7 +76,7 @@ public class AuthController : ControllerBase
                 StorePhone = normalizedType == "supplier" ? request.StorePhone?.Trim() : null,
                 Wilaya = normalizedType == "supplier" ? request.Wilaya?.Trim() : null,
                 Market = normalizedType == "supplier" ? request.Market?.Trim() : null,
-                Address = normalizedType == "supplier" ? request.Address?.Trim() : null,
+                Address = request.Address?.Trim(),
                 StoreDescription = normalizedType == "supplier" ? request.StoreDescription?.Trim() : null,
                 LogoUrl = normalizedType == "supplier" ? request.LogoUrl?.Trim() : null,
                 IsVerifiedSupplier = false,
@@ -281,6 +281,65 @@ public class AuthController : ControllerBase
             return StatusCode(500, new
             {
                 message = "An internal server error occurred while updating profile."
+            });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("customer-profile")]
+    public async Task<ActionResult<SupplierProfileResponse>> UpdateCustomerProfile([FromBody] UpdateCustomerProfileRequest request)
+    {
+        try
+        {
+            if (request == null)
+                return BadRequest("Request body is required.");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return NotFound("User not found.");
+
+            if (!string.Equals(user.AccountType, "customer", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Only customer accounts can update customer profile.");
+            }
+
+            user.FullName = request.FullName.Trim();
+            user.Address = string.IsNullOrWhiteSpace(request.Address) ? null : request.Address.Trim();
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+
+            return Ok(new SupplierProfileResponse(
+                user.Email ?? string.Empty,
+                user.FullName,
+                user.AccountType,
+                user.StoreName,
+                user.StorePhone,
+                user.Wilaya,
+                user.Market,
+                user.Address,
+                user.StoreDescription,
+                user.LogoUrl,
+                user.IsVerifiedSupplier
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while updating customer profile.");
+
+            return StatusCode(500, new
+            {
+                message = "An internal server error occurred while updating customer profile."
             });
         }
     }
