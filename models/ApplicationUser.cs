@@ -17,5 +17,6 @@ public class ApplicationUser : IdentityUser
     public string? Address { get; set; }
     public string? StoreDescription { get; set; }
     public string? LogoUrl { get; set; }
+    public string? SupplierCategories { get; set; }
     public bool IsVerifiedSupplier { get; set; } = false;
 }

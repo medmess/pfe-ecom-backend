@@ -55,10 +55,21 @@ public class AuthController : ControllerBase
 
             var isDealerAccount = normalizedType == "dealer" || normalizedType == "supplier";
             var isProviderAccount = normalizedType == "provider";
+            var supplierCategories = NormalizeSupplierCategories(request.SupplierCategories);
 
             if ((isDealerAccount || isProviderAccount) && string.IsNullOrWhiteSpace(request.StoreName))
             {
                 return BadRequest("StoreName is required for dealer and supplier accounts.");
+            }
+
+            if (isProviderAccount && supplierCategories.Count == 0)
+            {
+                return BadRequest("Select at least one supplier category.");
+            }
+
+            if (supplierCategories.Count > 3)
+            {
+                return BadRequest("You can select up to 3 supplier categories.");
             }
 
             var email = request.Email.Trim().ToLower();
@@ -82,6 +93,7 @@ public class AuthController : ControllerBase
                 Address = request.Address?.Trim(),
                 StoreDescription = (isDealerAccount || isProviderAccount) ? request.StoreDescription?.Trim() : null,
                 LogoUrl = (isDealerAccount || isProviderAccount) ? request.LogoUrl?.Trim() : null,
+                SupplierCategories = isProviderAccount ? string.Join(",", supplierCategories) : null,
                 IsVerifiedSupplier = false,
                 EmailConfirmed = true
             };
@@ -174,6 +186,7 @@ public class AuthController : ControllerBase
                 user.Address,
                 user.StoreDescription,
                 user.LogoUrl,
+                user.SupplierCategories,
                 user.IsVerifiedSupplier
             ));
         }
@@ -215,6 +228,7 @@ public class AuthController : ControllerBase
                 user.Address,
                 user.StoreDescription,
                 user.LogoUrl,
+                user.SupplierCategories,
                 user.IsVerifiedSupplier
             ));
         }
@@ -249,9 +263,10 @@ public class AuthController : ControllerBase
                 return NotFound("User not found.");
 
             if (!string.Equals(user.AccountType, "supplier", StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(user.AccountType, "dealer", StringComparison.OrdinalIgnoreCase))
+                && !string.Equals(user.AccountType, "dealer", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(user.AccountType, "provider", StringComparison.OrdinalIgnoreCase))
             {
-                return BadRequest("Only dealer accounts can update dealer profile.");
+                return BadRequest("Only dealer and supplier accounts can update this profile.");
             }
 
             user.FullName = request.FullName.Trim();
@@ -262,6 +277,13 @@ public class AuthController : ControllerBase
             user.Address = string.IsNullOrWhiteSpace(request.Address) ? null : request.Address.Trim();
             user.StoreDescription = string.IsNullOrWhiteSpace(request.StoreDescription) ? null : request.StoreDescription.Trim();
             user.LogoUrl = string.IsNullOrWhiteSpace(request.LogoUrl) ? null : request.LogoUrl.Trim();
+
+            var supplierCategories = NormalizeSupplierCategories(request.SupplierCategories);
+            if (string.Equals(user.AccountType, "provider", StringComparison.OrdinalIgnoreCase)
+                && supplierCategories.Count > 0)
+            {
+                user.SupplierCategories = string.Join(",", supplierCategories);
+            }
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -281,6 +303,7 @@ public class AuthController : ControllerBase
                 user.Address,
                 user.StoreDescription,
                 user.LogoUrl,
+                user.SupplierCategories,
                 user.IsVerifiedSupplier
             ));
         }
@@ -340,6 +363,7 @@ public class AuthController : ControllerBase
                 user.Address,
                 user.StoreDescription,
                 user.LogoUrl,
+                user.SupplierCategories,
                 user.IsVerifiedSupplier
             ));
         }
@@ -352,5 +376,30 @@ public class AuthController : ControllerBase
                 message = "An internal server error occurred while updating customer profile."
             });
         }
+    }
+
+    private static List<string> NormalizeSupplierCategories(IEnumerable<string>? categories)
+    {
+        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "GPU",
+            "CPU",
+            "RAM",
+            "Storage",
+            "Motherboard",
+            "PSU",
+            "Case",
+            "Cooling",
+            "Monitor",
+            "Keyboard",
+            "Mouse",
+            "Accessories"
+        };
+
+        return (categories ?? Array.Empty<string>())
+            .Select(c => (c ?? string.Empty).Trim())
+            .Where(c => allowed.Contains(c))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 }

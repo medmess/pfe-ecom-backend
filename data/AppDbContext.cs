@@ -53,6 +53,21 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         .HasForeignKey(p => p.SupplierId)
         .OnDelete(DeleteBehavior.SetNull);
 
+    builder.Entity<Product>()
+        .HasIndex(p => p.SupplierId);
+
+    builder.Entity<Product>()
+        .HasIndex(p => p.Category);
+
+    builder.Entity<Order>()
+        .HasIndex(o => o.UserId);
+
+    builder.Entity<Order>()
+        .HasIndex(o => o.OrderDate);
+
+    builder.Entity<OrderItem>()
+        .HasIndex(oi => oi.ProductId);
+
     builder.Entity<Order>()
         .HasOne(o => o.Payment)
         .WithOne(p => p.Order)
@@ -74,6 +89,18 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         .WithMany()
         .HasForeignKey(o => o.ProviderId)
         .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<SupplierOffer>()
+        .HasIndex(o => o.Category);
+
+    builder.Entity<SupplierOffer>()
+        .HasIndex(o => o.ProviderId);
+
+    builder.Entity<SupplyRequest>()
+        .HasIndex(r => r.DealerId);
+
+    builder.Entity<SupplyRequest>()
+        .HasIndex(r => r.SupplierOfferId);
 
     builder.Entity<SupplyRequest>()
         .HasOne(r => r.SupplierOffer)

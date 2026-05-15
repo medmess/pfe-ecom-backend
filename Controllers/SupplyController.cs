@@ -55,6 +55,10 @@ public class SupplyController : ControllerBase
         if (request.MinimumQuantity > request.AvailableQuantity)
             return BadRequest(new { message = "Minimum quantity cannot be greater than available quantity." });
 
+        var provider = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == providerId);
+        if (!User.IsInRole("Admin") && !CanUseCategory(provider?.SupplierCategories, request.Category))
+            return BadRequest(new { message = "This category is not enabled for your supplier account." });
+
         var offer = new SupplierOffer
         {
             Name = request.Name.Trim(),
@@ -95,6 +99,10 @@ public class SupplyController : ControllerBase
 
         if (request.MinimumQuantity > request.AvailableQuantity)
             return BadRequest(new { message = "Minimum quantity cannot be greater than available quantity." });
+
+        var provider = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+        if (!User.IsInRole("Admin") && !CanUseCategory(provider?.SupplierCategories, request.Category))
+            return BadRequest(new { message = "This category is not enabled for your supplier account." });
 
         offer.Name = request.Name.Trim();
         offer.Category = request.Category.Trim();
@@ -296,5 +304,19 @@ public class SupplyController : ControllerBase
             DealerName = !string.IsNullOrWhiteSpace(request.Dealer.StoreName) ? request.Dealer.StoreName : request.Dealer.FullName,
             SupplierName = !string.IsNullOrWhiteSpace(request.SupplierOffer.Provider.StoreName) ? request.SupplierOffer.Provider.StoreName : request.SupplierOffer.Provider.FullName
         };
+    }
+
+    private static bool CanUseCategory(string? supplierCategories, string? category)
+    {
+        if (string.IsNullOrWhiteSpace(category))
+            return false;
+
+        var allowed = (supplierCategories ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (allowed.Length == 0)
+            return true;
+
+        return allowed.Any(c => c.Equals(category.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 }

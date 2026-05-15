@@ -15,7 +15,8 @@ public record RegisterRequest(
     string? Market = null,
     string? Address = null,
     string? StoreDescription = null,
-    string? LogoUrl = null
+    string? LogoUrl = null,
+    string[]? SupplierCategories = null
 );
 
 public record LoginRequest(
@@ -36,6 +37,7 @@ public record AuthResponse(
     string? Address,
     string? StoreDescription,
     string? LogoUrl,
+    string? SupplierCategories,
     bool IsVerifiedSupplier
 );
 
@@ -50,6 +52,7 @@ public record SupplierProfileResponse(
     string? Address,
     string? StoreDescription,
     string? LogoUrl,
+    string? SupplierCategories,
     bool IsVerifiedSupplier
 );
 
@@ -61,7 +64,8 @@ public record UpdateSupplierProfileRequest(
     string? Market,
     string? Address,
     string? StoreDescription,
-    string? LogoUrl
+    string? LogoUrl,
+    string[]? SupplierCategories = null
 );
 
 public record UpdateCustomerProfileRequest(
