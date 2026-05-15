@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpGet]
-  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,DeliveryCompany")]
   public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll()
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -28,16 +28,19 @@ public class OrdersController : ControllerBase
       return Unauthorized();
 
     if (User.IsInRole("Admin"))
-      return Ok(await _orderService.GetAllAsync());
+      return Ok(await _orderService.GetForSupplierAsync(userId));
 
     if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       return Ok(await _orderService.GetForSupplierAsync(userId));
+
+    if (User.IsInRole("DeliveryCompany"))
+      return Ok(await _orderService.GetAllAsync());
 
     return Ok(await _orderService.GetForUserAsync(userId));
   }
 
   [HttpGet("{id}")]
-  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,DeliveryCompany")]
   public async Task<ActionResult<OrderDto>> GetById(int id)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -48,9 +51,11 @@ public class OrdersController : ControllerBase
     OrderDto? order;
 
     if (User.IsInRole("Admin"))
-      order = await _orderService.GetByIdAsync(id);
+      order = await _orderService.GetByIdForSupplierAsync(id, userId);
     else if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       order = await _orderService.GetByIdForSupplierAsync(id, userId);
+    else if (User.IsInRole("DeliveryCompany"))
+      order = await _orderService.GetByIdAsync(id);
     else
       order = await _orderService.GetByIdForUserAsync(id, userId);
 
@@ -61,7 +66,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpPost]
-  [Authorize(Roles = "Customer,Admin")]
+  [Authorize(Roles = "Customer")]
   public async Task<ActionResult<OrderDto>> Create([FromBody] CreateOrderRequest request)
   {
     if (!ModelState.IsValid)
@@ -85,10 +90,8 @@ public class OrdersController : ControllerBase
     return CreatedAtAction(nameof(GetById), new { id = createdOrder.Id }, createdOrder);
   }
 
-  // Dealer/Admin/Supplier can update the commercial order status only.
-  // DeliveryStatus is not updated here. It is updated only by DeliveryController.
   [HttpPut("{id}/status")]
-  [Authorize(Roles = "Supplier,Dealer,Admin")]
+  [Authorize(Roles = "Supplier,Dealer")]
   public async Task<ActionResult<OrderDto>> UpdateStatus(
     int id,
     [FromBody] UpdateOrderStatusRequest request)

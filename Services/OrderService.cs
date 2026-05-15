@@ -14,9 +14,14 @@ public class OrderService
     _context = context;
   }
 
+  // =========================================================
+  // GET ALL ORDERS
+  // =========================================================
+
   public async Task<List<OrderDto>> GetAllAsync()
   {
-    return await BuildOrdersQuery(_context.Orders).ToListAsync();
+    return await BuildOrdersQuery(_context.Orders)
+        .ToListAsync();
   }
 
   public async Task<List<OrderDto>> GetForUserAsync(string userId)
@@ -26,13 +31,31 @@ public class OrderService
     ).ToListAsync();
   }
 
+  // Admin / Supplier / Dealer only see orders
+  // containing THEIR OWN products
   public async Task<List<OrderDto>> GetForSupplierAsync(string supplierId)
   {
     return await BuildOrdersQuery(
         _context.Orders.Where(o =>
-            o.OrderItems.Any(i => i.Product.SupplierId == supplierId))
+            o.OrderItems.Any(i =>
+                i.Product.SupplierId == supplierId))
     ).ToListAsync();
   }
+
+  public async Task<List<OrderDto>> GetForDeliveryServiceAsync(
+      string deliveryServiceName)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.ShippingInfo != null &&
+            o.ShippingInfo.DeliveryService != null &&
+            o.ShippingInfo.DeliveryService == deliveryServiceName)
+    ).ToListAsync();
+  }
+
+  // =========================================================
+  // GET BY ID
+  // =========================================================
 
   public async Task<OrderDto?> GetByIdAsync(int id)
   {
@@ -41,24 +64,35 @@ public class OrderService
     ).FirstOrDefaultAsync();
   }
 
-  public async Task<OrderDto?> GetByIdForUserAsync(int id, string userId)
-  {
-    return await BuildOrdersQuery(
-        _context.Orders.Where(o =>
-            o.Id == id && o.UserId == userId)
-    ).FirstOrDefaultAsync();
-  }
-
-  public async Task<OrderDto?> GetByIdForSupplierAsync(int id, string supplierId)
+  public async Task<OrderDto?> GetByIdForUserAsync(
+      int id,
+      string userId)
   {
     return await BuildOrdersQuery(
         _context.Orders.Where(o =>
             o.Id == id &&
-            o.OrderItems.Any(i => i.Product.SupplierId == supplierId))
+            o.UserId == userId)
     ).FirstOrDefaultAsync();
   }
 
-  private IQueryable<OrderDto> BuildOrdersQuery(IQueryable<Order> query)
+  public async Task<OrderDto?> GetByIdForSupplierAsync(
+      int id,
+      string supplierId)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.Id == id &&
+            o.OrderItems.Any(i =>
+                i.Product.SupplierId == supplierId))
+    ).FirstOrDefaultAsync();
+  }
+
+  // =========================================================
+  // QUERY BUILDER
+  // =========================================================
+
+  private IQueryable<OrderDto> BuildOrdersQuery(
+      IQueryable<Order> query)
   {
     return query
         .AsNoTracking()
@@ -73,18 +107,19 @@ public class OrderService
           OrderDate = o.OrderDate,
           TotalAmount = o.TotalAmount,
 
-          // Commercial order status
+          // Commercial status
           Status = o.Status == "ReturnRequested"
               ? "Returned"
               : o.Status,
 
-          // Delivery company tracking status
+          // Delivery tracking
           DeliveryStatus = string.IsNullOrWhiteSpace(o.DeliveryStatus)
               ? "Pending"
               : o.DeliveryStatus,
 
           CancelledAt = o.CancelledAt,
           CancelReason = o.CancelReason,
+
           ReturnRequestedAt = o.ReturnRequestedAt,
           ReturnReason = o.ReturnReason,
 
@@ -112,6 +147,10 @@ public class OrderService
           }).ToList()
         });
   }
+
+  // =========================================================
+  // CREATE ORDER
+  // =========================================================
 
   public async Task<OrderDto?> CreateAsync(
       string userId,
@@ -157,14 +196,15 @@ public class OrderService
       UserId = userId,
       OrderDate = DateTime.UtcNow,
 
-      // Main order state
       Status = "Pending",
 
-      // Delivery tracking state
+      // Delivery tracking
       DeliveryStatus = "Pending",
 
       TotalAmount = 0,
+
       OrderItems = new List<OrderItem>(),
+
       ShippingInfo = BuildShippingInfo(request.ShippingInfo)
     };
 
@@ -195,16 +235,9 @@ public class OrderService
     return await GetByIdForUserAsync(order.Id, userId);
   }
 
-  public async Task<List<OrderDto>> GetForDeliveryServiceAsync(
-      string deliveryServiceName)
-  {
-    return await BuildOrdersQuery(
-        _context.Orders.Where(o =>
-            o.ShippingInfo != null &&
-            o.ShippingInfo.DeliveryService != null &&
-            o.ShippingInfo.DeliveryService == deliveryServiceName)
-    ).ToListAsync();
-  }
+  // =========================================================
+  // SHIPPING INFO
+  // =========================================================
 
   private static OrderShippingInfo? BuildShippingInfo(
       ShippingInfoDto? shipping)
@@ -234,8 +267,11 @@ public class OrderService
         : value.Trim();
   }
 
-  // Supplier/Dealer/Admin update ONLY commercial order status.
-  // Delivery status is handled separately by DeliveryController.
+  // =========================================================
+  // UPDATE COMMERCIAL STATUS
+  // ONLY SUPPLIER / DEALER
+  // =========================================================
+
   public async Task<OrderDto?> UpdateStatusAsync(
       int id,
       string status,
@@ -254,7 +290,8 @@ public class OrderService
     };
 
     var normalized = allowed.FirstOrDefault(s =>
-        s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
+        s.Equals(status.Trim(),
+        StringComparison.OrdinalIgnoreCase));
 
     if (normalized == null)
       return null;
@@ -264,7 +301,8 @@ public class OrderService
             .ThenInclude(i => i.Product)
         .FirstOrDefaultAsync(o =>
             o.Id == id &&
-            o.OrderItems.Any(i => i.Product.SupplierId == supplierId));
+            o.OrderItems.Any(i =>
+                i.Product.SupplierId == supplierId));
 
     if (order == null)
       return null;
@@ -275,6 +313,10 @@ public class OrderService
 
     return await GetByIdForSupplierAsync(id, supplierId);
   }
+
+  // =========================================================
+  // CUSTOMER CANCEL
+  // =========================================================
 
   public async Task<OrderDto?> CancelOrderAsync(
       int id,
@@ -309,6 +351,10 @@ public class OrderService
     return await GetByIdForUserAsync(id, userId);
   }
 
+  // =========================================================
+  // CUSTOMER RETURN
+  // =========================================================
+
   public async Task<OrderDto?> RequestReturnAsync(
       int id,
       string userId,
@@ -322,7 +368,6 @@ public class OrderService
     if (order == null)
       return null;
 
-    // Return only after real delivery
     if (order.DeliveryStatus != "Delivered")
       return null;
 
