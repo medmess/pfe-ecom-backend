@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpGet]
-  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,DeliveryCompany")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,Delivery")]
   public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll()
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -28,19 +28,19 @@ public class OrdersController : ControllerBase
       return Unauthorized();
 
     if (User.IsInRole("Admin"))
-      return Ok(await _orderService.GetForSupplierAsync(userId));
+      return Ok(await _orderService.GetAllAsync());
 
     if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       return Ok(await _orderService.GetForSupplierAsync(userId));
 
-    if (User.IsInRole("DeliveryCompany"))
+    if (User.IsInRole("Delivery"))
       return Ok(await _orderService.GetAllAsync());
 
     return Ok(await _orderService.GetForUserAsync(userId));
   }
 
   [HttpGet("{id}")]
-  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,DeliveryCompany")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin,Delivery")]
   public async Task<ActionResult<OrderDto>> GetById(int id)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -51,10 +51,10 @@ public class OrdersController : ControllerBase
     OrderDto? order;
 
     if (User.IsInRole("Admin"))
-      order = await _orderService.GetByIdForSupplierAsync(id, userId);
+      order = await _orderService.GetByIdAsync(id);
     else if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       order = await _orderService.GetByIdForSupplierAsync(id, userId);
-    else if (User.IsInRole("DeliveryCompany"))
+    else if (User.IsInRole("Delivery"))
       order = await _orderService.GetByIdAsync(id);
     else
       order = await _orderService.GetByIdForUserAsync(id, userId);
@@ -91,7 +91,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpPut("{id}/status")]
-  [Authorize(Roles = "Supplier,Dealer")]
+  [Authorize(Roles = "Supplier,Dealer,Admin")]
   public async Task<ActionResult<OrderDto>> UpdateStatus(
     int id,
     [FromBody] UpdateOrderStatusRequest request)
@@ -104,7 +104,9 @@ public class OrdersController : ControllerBase
     if (string.IsNullOrEmpty(userId))
       return Unauthorized();
 
-    var updatedOrder = await _orderService.UpdateStatusAsync(id, request.Status, userId);
+    var updatedOrder = User.IsInRole("Admin")
+      ? await _orderService.UpdateStatusAsAdminAsync(id, request.Status)
+      : await _orderService.UpdateStatusAsync(id, request.Status, userId);
 
     if (updatedOrder == null)
     {

@@ -314,6 +314,43 @@ public class OrderService
     return await GetByIdForSupplierAsync(id, supplierId);
   }
 
+  public async Task<OrderDto?> UpdateStatusAsAdminAsync(
+      int id,
+      string status)
+  {
+    if (string.IsNullOrWhiteSpace(status))
+      return null;
+
+    var allowed = new[]
+    {
+      "Cancelled",
+      "Returned"
+    };
+
+    var normalized = allowed.FirstOrDefault(s =>
+        s.Equals(status.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    if (normalized == null)
+      return null;
+
+    var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+
+    if (order == null)
+      return null;
+
+    order.Status = normalized;
+
+    if (normalized == "Cancelled" && order.CancelledAt == null)
+      order.CancelledAt = DateTime.UtcNow;
+
+    if (normalized == "Returned" && order.ReturnRequestedAt == null)
+      order.ReturnRequestedAt = DateTime.UtcNow;
+
+    await _context.SaveChangesAsync();
+
+    return await GetByIdAsync(id);
+  }
+
   // =========================================================
   // CUSTOMER CANCEL
   // =========================================================
