@@ -26,37 +26,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
   {
     base.OnModelCreating(builder);
 
-    builder.Entity<Product>()
-        .Property(p => p.Price)
-        .HasPrecision(18, 2);
-
-    builder.Entity<Order>()
-        .Property(o => o.TotalAmount)
-        .HasPrecision(18, 2);
-
-    builder.Entity<OrderItem>()
-        .Property(oi => oi.UnitPrice)
-        .HasPrecision(18, 2);
-
-    builder.Entity<Payment>()
-        .Property(p => p.Amount)
-        .HasPrecision(18, 2);
-
-    builder.Entity<SupplierOffer>()
-        .Property(p => p.UnitPrice)
-        .HasPrecision(18, 2);
-
-    builder.Entity<SupplyRequest>()
-        .Property(r => r.TotalAmount)
-        .HasPrecision(18, 2);
-
-    builder.Entity<DeliveryPrice>()
-        .Property(p => p.AddressPrice)
-        .HasPrecision(18, 2);
-
-    builder.Entity<DeliveryPrice>()
-        .Property(p => p.OfficePrice)
-        .HasPrecision(18, 2);
+    builder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
+    builder.Entity<Order>().Property(o => o.TotalAmount).HasPrecision(18, 2);
+    builder.Entity<OrderItem>().Property(oi => oi.UnitPrice).HasPrecision(18, 2);
+    builder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+    builder.Entity<SupplierOffer>().Property(p => p.UnitPrice).HasPrecision(18, 2);
+    builder.Entity<SupplyRequest>().Property(r => r.TotalAmount).HasPrecision(18, 2);
+    builder.Entity<DeliveryPrice>().Property(p => p.AddressPrice).HasPrecision(18, 2);
+    builder.Entity<DeliveryPrice>().Property(p => p.OfficePrice).HasPrecision(18, 2);
 
     builder.Entity<Product>()
         .HasOne(p => p.Supplier)
@@ -64,20 +41,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         .HasForeignKey(p => p.SupplierId)
         .OnDelete(DeleteBehavior.SetNull);
 
-    builder.Entity<Product>()
-        .HasIndex(p => p.SupplierId);
+    builder.Entity<Product>().HasIndex(p => p.SupplierId);
+    builder.Entity<Product>().HasIndex(p => p.Category);
 
-    builder.Entity<Product>()
-        .HasIndex(p => p.Category);
+    builder.Entity<Order>().HasIndex(o => o.UserId);
+    builder.Entity<Order>().HasIndex(o => o.OrderDate);
+    builder.Entity<Order>().HasIndex(o => o.DeliveryStatus);
 
-    builder.Entity<Order>()
-        .HasIndex(o => o.UserId);
-
-    builder.Entity<Order>()
-        .HasIndex(o => o.OrderDate);
-
-    builder.Entity<OrderItem>()
-        .HasIndex(oi => oi.ProductId);
+    builder.Entity<OrderItem>().HasIndex(oi => oi.ProductId);
 
     builder.Entity<Order>()
         .HasOne(o => o.Payment)
@@ -101,17 +72,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
         .HasForeignKey(o => o.ProviderId)
         .OnDelete(DeleteBehavior.Cascade);
 
-    builder.Entity<SupplierOffer>()
-        .HasIndex(o => o.Category);
+    builder.Entity<SupplierOffer>().HasIndex(o => o.Category);
+    builder.Entity<SupplierOffer>().HasIndex(o => o.ProviderId);
 
-    builder.Entity<SupplierOffer>()
-        .HasIndex(o => o.ProviderId);
-
-    builder.Entity<SupplyRequest>()
-        .HasIndex(r => r.DealerId);
-
-    builder.Entity<SupplyRequest>()
-        .HasIndex(r => r.SupplierOfferId);
+    builder.Entity<SupplyRequest>().HasIndex(r => r.DealerId);
+    builder.Entity<SupplyRequest>().HasIndex(r => r.SupplierOfferId);
 
     builder.Entity<SupplyRequest>()
         .HasOne(r => r.SupplierOffer)

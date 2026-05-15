@@ -10,7 +10,11 @@ public class OrderDto
 
   public decimal TotalAmount { get; set; }
 
+  // Main order state
   public string Status { get; set; } = string.Empty;
+
+  // Delivery company tracking state
+  public string DeliveryStatus { get; set; } = string.Empty;
 
   public DateTime? CancelledAt { get; set; }
 

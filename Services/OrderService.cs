@@ -72,23 +72,37 @@ public class OrderService
           UserId = o.UserId,
           OrderDate = o.OrderDate,
           TotalAmount = o.TotalAmount,
-          Status = o.Status == "ReturnRequested" ? "Returned" : o.Status,
+
+          // Commercial order status
+          Status = o.Status == "ReturnRequested"
+              ? "Returned"
+              : o.Status,
+
+          // Delivery company tracking status
+          DeliveryStatus = string.IsNullOrWhiteSpace(o.DeliveryStatus)
+              ? "Pending"
+              : o.DeliveryStatus,
+
           CancelledAt = o.CancelledAt,
           CancelReason = o.CancelReason,
           ReturnRequestedAt = o.ReturnRequestedAt,
           ReturnReason = o.ReturnReason,
-          ShippingInfo = o.ShippingInfo == null ? null : new ShippingInfoDto
-          {
-            FullName = o.ShippingInfo.FullName,
-            Phone = o.ShippingInfo.Phone,
-            Wilaya = o.ShippingInfo.Wilaya,
-            Address = o.ShippingInfo.Address,
-            Notes = o.ShippingInfo.Notes,
-            AddressChoice = o.ShippingInfo.AddressChoice,
-            DeliveryService = o.ShippingInfo.DeliveryService,
-            DeliveryMode = o.ShippingInfo.DeliveryMode,
-            AgencySite = o.ShippingInfo.AgencySite
-          },
+
+          ShippingInfo = o.ShippingInfo == null
+              ? null
+              : new ShippingInfoDto
+              {
+                FullName = o.ShippingInfo.FullName,
+                Phone = o.ShippingInfo.Phone,
+                Wilaya = o.ShippingInfo.Wilaya,
+                Address = o.ShippingInfo.Address,
+                Notes = o.ShippingInfo.Notes,
+                AddressChoice = o.ShippingInfo.AddressChoice,
+                DeliveryService = o.ShippingInfo.DeliveryService,
+                DeliveryMode = o.ShippingInfo.DeliveryMode,
+                AgencySite = o.ShippingInfo.AgencySite
+              },
+
           Items = o.OrderItems.Select(i => new OrderItemDto
           {
             ProductId = i.ProductId,
@@ -99,7 +113,9 @@ public class OrderService
         });
   }
 
-  public async Task<OrderDto?> CreateAsync(string userId, CreateOrderRequest request)
+  public async Task<OrderDto?> CreateAsync(
+      string userId,
+      CreateOrderRequest request)
   {
     if (request.Items == null || request.Items.Count == 0)
       return null;
@@ -117,7 +133,9 @@ public class OrderService
     if (normalizedItems.Count == 0)
       return null;
 
-    var ids = normalizedItems.Select(i => i.ProductId).ToList();
+    var ids = normalizedItems
+        .Select(i => i.ProductId)
+        .ToList();
 
     var products = await _context.Products
         .Where(p => ids.Contains(p.Id))
@@ -138,7 +156,13 @@ public class OrderService
     {
       UserId = userId,
       OrderDate = DateTime.UtcNow,
+
+      // Main order state
       Status = "Pending",
+
+      // Delivery tracking state
+      DeliveryStatus = "Pending",
+
       TotalAmount = 0,
       OrderItems = new List<OrderItem>(),
       ShippingInfo = BuildShippingInfo(request.ShippingInfo)
@@ -158,18 +182,21 @@ public class OrderService
       });
 
       total += product.Price * item.Quantity;
+
       product.StockQuantity -= item.Quantity;
     }
 
     order.TotalAmount = total;
 
     _context.Orders.Add(order);
+
     await _context.SaveChangesAsync();
 
     return await GetByIdForUserAsync(order.Id, userId);
   }
 
-  public async Task<List<OrderDto>> GetForDeliveryServiceAsync(string deliveryServiceName)
+  public async Task<List<OrderDto>> GetForDeliveryServiceAsync(
+      string deliveryServiceName)
   {
     return await BuildOrdersQuery(
         _context.Orders.Where(o =>
@@ -179,7 +206,8 @@ public class OrderService
     ).ToListAsync();
   }
 
-  private static OrderShippingInfo? BuildShippingInfo(ShippingInfoDto? shipping)
+  private static OrderShippingInfo? BuildShippingInfo(
+      ShippingInfoDto? shipping)
   {
     if (shipping == null)
       return null;
@@ -201,10 +229,17 @@ public class OrderService
 
   private static string? Normalize(string? value)
   {
-    return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    return string.IsNullOrWhiteSpace(value)
+        ? null
+        : value.Trim();
   }
 
-  public async Task<OrderDto?> UpdateStatusAsync(int id, string status, string supplierId)
+  // Supplier/Dealer/Admin update ONLY commercial order status.
+  // Delivery status is handled separately by DeliveryController.
+  public async Task<OrderDto?> UpdateStatusAsync(
+      int id,
+      string status,
+      string supplierId)
   {
     if (string.IsNullOrWhiteSpace(status))
       return null;
@@ -213,8 +248,6 @@ public class OrderService
     {
       "Pending",
       "Processing",
-      "Shipped",
-      "Delivered",
       "Cancelled",
       "Returned",
       "ReturnRejected"
@@ -243,17 +276,23 @@ public class OrderService
     return await GetByIdForSupplierAsync(id, supplierId);
   }
 
-  public async Task<OrderDto?> CancelOrderAsync(int id, string userId, string? reason)
+  public async Task<OrderDto?> CancelOrderAsync(
+      int id,
+      string userId,
+      string? reason)
   {
     var order = await _context.Orders
         .Include(o => o.OrderItems)
             .ThenInclude(i => i.Product)
-        .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+        .FirstOrDefaultAsync(o =>
+            o.Id == id &&
+            o.UserId == userId);
 
     if (order == null)
       return null;
 
-    if (order.Status != "Pending" && order.Status != "Processing")
+    if (order.Status != "Pending" &&
+        order.Status != "Processing")
       return null;
 
     order.Status = "Cancelled";
@@ -270,15 +309,21 @@ public class OrderService
     return await GetByIdForUserAsync(id, userId);
   }
 
-  public async Task<OrderDto?> RequestReturnAsync(int id, string userId, string? reason)
+  public async Task<OrderDto?> RequestReturnAsync(
+      int id,
+      string userId,
+      string? reason)
   {
     var order = await _context.Orders
-        .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+        .FirstOrDefaultAsync(o =>
+            o.Id == id &&
+            o.UserId == userId);
 
     if (order == null)
       return null;
 
-    if (order.Status != "Delivered")
+    // Return only after real delivery
+    if (order.DeliveryStatus != "Delivered")
       return null;
 
     order.Status = "Returned";

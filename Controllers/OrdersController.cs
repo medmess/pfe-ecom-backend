@@ -28,14 +28,10 @@ public class OrdersController : ControllerBase
       return Unauthorized();
 
     if (User.IsInRole("Admin"))
-    {
       return Ok(await _orderService.GetAllAsync());
-    }
 
-    if ((User.IsInRole("Supplier") || User.IsInRole("Dealer")))
-    {
+    if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       return Ok(await _orderService.GetForSupplierAsync(userId));
-    }
 
     return Ok(await _orderService.GetForUserAsync(userId));
   }
@@ -52,17 +48,11 @@ public class OrdersController : ControllerBase
     OrderDto? order;
 
     if (User.IsInRole("Admin"))
-    {
       order = await _orderService.GetByIdAsync(id);
-    }
-    else if ((User.IsInRole("Supplier") || User.IsInRole("Dealer")))
-    {
+    else if (User.IsInRole("Supplier") || User.IsInRole("Dealer"))
       order = await _orderService.GetByIdForSupplierAsync(id, userId);
-    }
     else
-    {
       order = await _orderService.GetByIdForUserAsync(id, userId);
-    }
 
     if (order == null)
       return NotFound(new { message = "Commande introuvable ou accès refusé" });
@@ -95,9 +85,13 @@ public class OrdersController : ControllerBase
     return CreatedAtAction(nameof(GetById), new { id = createdOrder.Id }, createdOrder);
   }
 
+  // Dealer/Admin/Supplier can update the commercial order status only.
+  // DeliveryStatus is not updated here. It is updated only by DeliveryController.
   [HttpPut("{id}/status")]
   [Authorize(Roles = "Supplier,Dealer,Admin")]
-  public async Task<ActionResult<OrderDto>> UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
+  public async Task<ActionResult<OrderDto>> UpdateStatus(
+    int id,
+    [FromBody] UpdateOrderStatusRequest request)
   {
     if (!ModelState.IsValid)
       return ValidationProblem(ModelState);
@@ -122,7 +116,9 @@ public class OrdersController : ControllerBase
 
   [HttpPut("{id}/cancel")]
   [Authorize(Roles = "Customer")]
-  public async Task<ActionResult<OrderDto>> CancelOrder(int id, [FromBody] OrderActionRequest request)
+  public async Task<ActionResult<OrderDto>> CancelOrder(
+    int id,
+    [FromBody] OrderActionRequest request)
   {
     if (!ModelState.IsValid)
       return ValidationProblem(ModelState);
@@ -148,7 +144,9 @@ public class OrdersController : ControllerBase
   [HttpPut("{id}/return-request")]
   [HttpPut("{id}/return")]
   [Authorize(Roles = "Customer")]
-  public async Task<ActionResult<OrderDto>> RequestReturn(int id, [FromBody] OrderActionRequest request)
+  public async Task<ActionResult<OrderDto>> RequestReturn(
+    int id,
+    [FromBody] OrderActionRequest request)
   {
     if (!ModelState.IsValid)
       return ValidationProblem(ModelState);

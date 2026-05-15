@@ -16,6 +16,11 @@ public class Order
   [MaxLength(50)]
   public string Status { get; set; } = "Pending";
 
+  // Delivery company updates this field only.
+  // Customer, dealer, and admin will only see it.
+  [MaxLength(50)]
+  public string DeliveryStatus { get; set; } = "Pending";
+
   public DateTime? CancelledAt { get; set; }
 
   [MaxLength(500)]
