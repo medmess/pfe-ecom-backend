@@ -16,6 +16,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
   public DbSet<OrderItem> OrderItems { get; set; }
   public DbSet<OrderShippingInfo> OrderShippingInfos { get; set; }
   public DbSet<Payment> Payments { get; set; }
+  public DbSet<SupplierOffer> SupplierOffers { get; set; }
+  public DbSet<SupplyRequest> SupplyRequests { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
@@ -35,6 +37,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
 
     builder.Entity<Payment>()
         .Property(p => p.Amount)
+        .HasPrecision(18, 2);
+
+    builder.Entity<SupplierOffer>()
+        .Property(p => p.UnitPrice)
+        .HasPrecision(18, 2);
+
+    builder.Entity<SupplyRequest>()
+        .Property(r => r.TotalAmount)
         .HasPrecision(18, 2);
 
     builder.Entity<Product>()
@@ -58,5 +68,23 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole, str
     builder.Entity<OrderShippingInfo>()
         .HasIndex(s => s.OrderId)
         .IsUnique();
+
+    builder.Entity<SupplierOffer>()
+        .HasOne(o => o.Provider)
+        .WithMany()
+        .HasForeignKey(o => o.ProviderId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<SupplyRequest>()
+        .HasOne(r => r.SupplierOffer)
+        .WithMany()
+        .HasForeignKey(r => r.SupplierOfferId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Entity<SupplyRequest>()
+        .HasOne(r => r.Dealer)
+        .WithMany()
+        .HasForeignKey(r => r.DealerId)
+        .OnDelete(DeleteBehavior.Restrict);
   }
 }

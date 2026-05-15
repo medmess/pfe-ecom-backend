@@ -82,8 +82,8 @@ public class AdminController : ControllerBase
         if (roles.Contains("Admin"))
             return BadRequest("Admin accounts cannot be deleted.");
 
-        if (user.AccountType?.ToLower() != "customer" && user.AccountType?.ToLower() != "supplier" && user.AccountType?.ToLower() != "dealer")
-            return BadRequest("Only customer or dealer accounts can be deleted.");
+        if (user.AccountType?.ToLower() != "customer" && user.AccountType?.ToLower() != "supplier" && user.AccountType?.ToLower() != "dealer" && user.AccountType?.ToLower() != "provider")
+            return BadRequest("Only customer, dealer, or supplier accounts can be deleted.");
 
         var result = await _userManager.DeleteAsync(user);
 

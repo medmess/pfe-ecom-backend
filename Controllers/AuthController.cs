@@ -46,17 +46,19 @@ public class AuthController : ControllerBase
             if (string.IsNullOrWhiteSpace(request.FullName))
                 return BadRequest("FullName is required.");
 
-            var submittedType = (request.AccountType ?? "customer").Trim().ToLower();
-            var normalizedType = submittedType == "dealer" ? "supplier" : submittedType;
+            var normalizedType = (request.AccountType ?? "customer").Trim().ToLower();
 
-            if (normalizedType != "customer" && normalizedType != "supplier")
+            if (normalizedType != "customer" && normalizedType != "dealer" && normalizedType != "supplier" && normalizedType != "provider")
             {
-                return BadRequest("AccountType must be either 'customer' or 'dealer'.");
+                return BadRequest("AccountType must be either 'customer', 'dealer', or 'supplier'.");
             }
 
-            if (normalizedType == "supplier" && string.IsNullOrWhiteSpace(request.StoreName))
+            var isDealerAccount = normalizedType == "dealer" || normalizedType == "supplier";
+            var isProviderAccount = normalizedType == "provider";
+
+            if ((isDealerAccount || isProviderAccount) && string.IsNullOrWhiteSpace(request.StoreName))
             {
-                return BadRequest("StoreName is required for dealer accounts.");
+                return BadRequest("StoreName is required for dealer and supplier accounts.");
             }
 
             var email = request.Email.Trim().ToLower();
@@ -73,13 +75,13 @@ public class AuthController : ControllerBase
                 Email = email,
                 FullName = request.FullName.Trim(),
                 AccountType = normalizedType,
-                StoreName = normalizedType == "supplier" ? request.StoreName?.Trim() : null,
-                StorePhone = normalizedType == "supplier" ? request.StorePhone?.Trim() : null,
-                Wilaya = normalizedType == "supplier" ? request.Wilaya?.Trim() : null,
-                Market = normalizedType == "supplier" ? request.Market?.Trim() : null,
+                StoreName = (isDealerAccount || isProviderAccount) ? request.StoreName?.Trim() : null,
+                StorePhone = (isDealerAccount || isProviderAccount) ? request.StorePhone?.Trim() : null,
+                Wilaya = (isDealerAccount || isProviderAccount) ? request.Wilaya?.Trim() : null,
+                Market = (isDealerAccount || isProviderAccount) ? request.Market?.Trim() : null,
                 Address = request.Address?.Trim(),
-                StoreDescription = normalizedType == "supplier" ? request.StoreDescription?.Trim() : null,
-                LogoUrl = normalizedType == "supplier" ? request.LogoUrl?.Trim() : null,
+                StoreDescription = (isDealerAccount || isProviderAccount) ? request.StoreDescription?.Trim() : null,
+                LogoUrl = (isDealerAccount || isProviderAccount) ? request.LogoUrl?.Trim() : null,
                 IsVerifiedSupplier = false,
                 EmailConfirmed = true
             };
@@ -91,7 +93,13 @@ public class AuthController : ControllerBase
                 return BadRequest(createResult.Errors.Select(e => e.Description));
             }
 
-            var roleName = normalizedType == "supplier" ? "Supplier" : "Customer";
+            var roleName = normalizedType switch
+            {
+                "provider" => "Provider",
+                "dealer" => "Dealer",
+                "supplier" => "Supplier",
+                _ => "Customer"
+            };
 
             var roleResult = await _userManager.AddToRoleAsync(user, roleName);
 
