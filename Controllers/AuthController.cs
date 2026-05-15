@@ -46,16 +46,17 @@ public class AuthController : ControllerBase
             if (string.IsNullOrWhiteSpace(request.FullName))
                 return BadRequest("FullName is required.");
 
-            var normalizedType = (request.AccountType ?? "customer").Trim().ToLower();
+            var submittedType = (request.AccountType ?? "customer").Trim().ToLower();
+            var normalizedType = submittedType == "dealer" ? "supplier" : submittedType;
 
             if (normalizedType != "customer" && normalizedType != "supplier")
             {
-                return BadRequest("AccountType must be either 'customer' or 'supplier'.");
+                return BadRequest("AccountType must be either 'customer' or 'dealer'.");
             }
 
             if (normalizedType == "supplier" && string.IsNullOrWhiteSpace(request.StoreName))
             {
-                return BadRequest("StoreName is required for supplier accounts.");
+                return BadRequest("StoreName is required for dealer accounts.");
             }
 
             var email = request.Email.Trim().ToLower();
@@ -239,9 +240,10 @@ public class AuthController : ControllerBase
             if (user is null)
                 return NotFound("User not found.");
 
-            if (!string.Equals(user.AccountType, "supplier", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(user.AccountType, "supplier", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(user.AccountType, "dealer", StringComparison.OrdinalIgnoreCase))
             {
-                return BadRequest("Only supplier accounts can update supplier profile.");
+                return BadRequest("Only dealer accounts can update dealer profile.");
             }
 
             user.FullName = request.FullName.Trim();
@@ -276,7 +278,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while updating supplier profile.");
+            _logger.LogError(ex, "Error while updating dealer profile.");
 
             return StatusCode(500, new
             {

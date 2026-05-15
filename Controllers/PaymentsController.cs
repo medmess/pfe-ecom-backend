@@ -77,7 +77,7 @@ public class PaymentsController : ControllerBase
   }
 
   [HttpPost("confirm/{paymentId}")]
-  [Authorize(Roles = "Customer,Supplier,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
   public async Task<IActionResult> ConfirmPayment(int paymentId)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -121,7 +121,7 @@ public class PaymentsController : ControllerBase
 
       await _context.SaveChangesAsync();
 
-      return Ok(ToPaymentResponse("Cash on delivery payment confirmed by supplier.", payment));
+      return Ok(ToPaymentResponse("Cash on delivery payment confirmed by dealer.", payment));
     }
 
     if (!isAdmin && !isCustomerOwner)
@@ -164,7 +164,7 @@ public class PaymentsController : ControllerBase
   }
 
   [HttpGet("order/{orderId}")]
-  [Authorize(Roles = "Customer,Supplier,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
   public async Task<IActionResult> GetPaymentByOrder(int orderId)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -25,7 +25,7 @@ namespace pfe.ecom.api.Controllers
             return Ok(products);
         }
     [HttpGet("mine")]
-    [Authorize(Roles = "Supplier,Admin")]
+    [Authorize(Roles = "Supplier,Dealer,Admin")]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetMine()
     {
       var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -49,7 +49,7 @@ namespace pfe.ecom.api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supplier,Admin")]
+        [Authorize(Roles = "Supplier,Dealer,Admin")]
         public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductRequest request)
         {
             if (!ModelState.IsValid)
@@ -71,7 +71,7 @@ namespace pfe.ecom.api.Controllers
         }
 
         [HttpPost("upload")]
-        [Authorize(Roles = "Supplier,Admin")]
+        [Authorize(Roles = "Supplier,Dealer,Admin")]
         public async Task<ActionResult<ProductDto>> CreateWithImage([FromForm] ProductFormRequest request)
         {
             if (!ModelState.IsValid)
@@ -107,7 +107,7 @@ namespace pfe.ecom.api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Supplier,Admin")]
+        [Authorize(Roles = "Supplier,Dealer,Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequest request)
         {
             if (!ModelState.IsValid)
@@ -129,7 +129,7 @@ namespace pfe.ecom.api.Controllers
         }
 
         [HttpPut("{id}/upload")]
-        [Authorize(Roles = "Supplier,Admin")]
+        [Authorize(Roles = "Supplier,Dealer,Admin")]
         public async Task<ActionResult<ProductDto>> UpdateWithImage(int id, [FromForm] ProductFormRequest request)
         {
             if (!ModelState.IsValid)
@@ -166,7 +166,7 @@ namespace pfe.ecom.api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Supplier,Admin")]
+        [Authorize(Roles = "Supplier,Dealer,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

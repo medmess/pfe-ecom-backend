@@ -19,7 +19,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpGet]
-  [Authorize(Roles = "Customer,Supplier,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
   public async Task<ActionResult<IEnumerable<OrderDto>>> GetAll()
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -32,7 +32,7 @@ public class OrdersController : ControllerBase
       return Ok(await _orderService.GetAllAsync());
     }
 
-    if (User.IsInRole("Supplier"))
+    if ((User.IsInRole("Supplier") || User.IsInRole("Dealer")))
     {
       return Ok(await _orderService.GetForSupplierAsync(userId));
     }
@@ -41,7 +41,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpGet("{id}")]
-  [Authorize(Roles = "Customer,Supplier,Admin")]
+  [Authorize(Roles = "Customer,Supplier,Dealer,Admin")]
   public async Task<ActionResult<OrderDto>> GetById(int id)
   {
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -55,7 +55,7 @@ public class OrdersController : ControllerBase
     {
       order = await _orderService.GetByIdAsync(id);
     }
-    else if (User.IsInRole("Supplier"))
+    else if ((User.IsInRole("Supplier") || User.IsInRole("Dealer")))
     {
       order = await _orderService.GetByIdForSupplierAsync(id, userId);
     }
@@ -96,7 +96,7 @@ public class OrdersController : ControllerBase
   }
 
   [HttpPut("{id}/status")]
-  [Authorize(Roles = "Supplier,Admin")]
+  [Authorize(Roles = "Supplier,Dealer,Admin")]
   public async Task<ActionResult<OrderDto>> UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
   {
     if (!ModelState.IsValid)
