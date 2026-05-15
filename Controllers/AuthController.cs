@@ -48,18 +48,19 @@ public class AuthController : ControllerBase
 
             var normalizedType = (request.AccountType ?? "customer").Trim().ToLower();
 
-            if (normalizedType != "customer" && normalizedType != "dealer" && normalizedType != "supplier" && normalizedType != "provider")
+            if (normalizedType != "customer" && normalizedType != "dealer" && normalizedType != "supplier" && normalizedType != "provider" && normalizedType != "delivery")
             {
-                return BadRequest("AccountType must be either 'customer', 'dealer', or 'supplier'.");
+                return BadRequest("AccountType must be customer, dealer, supplier, or delivery.");
             }
 
             var isDealerAccount = normalizedType == "dealer" || normalizedType == "supplier";
             var isProviderAccount = normalizedType == "provider";
+            var isDeliveryAccount = normalizedType == "delivery";
             var supplierCategories = NormalizeSupplierCategories(request.SupplierCategories);
 
-            if ((isDealerAccount || isProviderAccount) && string.IsNullOrWhiteSpace(request.StoreName))
+            if ((isDealerAccount || isProviderAccount || isDeliveryAccount) && string.IsNullOrWhiteSpace(request.StoreName))
             {
-                return BadRequest("StoreName is required for dealer and supplier accounts.");
+                return BadRequest("Company or store name is required.");
             }
 
             if (isProviderAccount && supplierCategories.Count == 0)
@@ -86,13 +87,13 @@ public class AuthController : ControllerBase
                 Email = email,
                 FullName = request.FullName.Trim(),
                 AccountType = normalizedType,
-                StoreName = (isDealerAccount || isProviderAccount) ? request.StoreName?.Trim() : null,
-                StorePhone = (isDealerAccount || isProviderAccount) ? request.StorePhone?.Trim() : null,
-                Wilaya = (isDealerAccount || isProviderAccount) ? request.Wilaya?.Trim() : null,
-                Market = (isDealerAccount || isProviderAccount) ? request.Market?.Trim() : null,
+                StoreName = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.StoreName?.Trim() : null,
+                StorePhone = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.StorePhone?.Trim() : null,
+                Wilaya = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.Wilaya?.Trim() : null,
+                Market = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.Market?.Trim() : null,
                 Address = request.Address?.Trim(),
-                StoreDescription = (isDealerAccount || isProviderAccount) ? request.StoreDescription?.Trim() : null,
-                LogoUrl = (isDealerAccount || isProviderAccount) ? request.LogoUrl?.Trim() : null,
+                StoreDescription = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.StoreDescription?.Trim() : null,
+                LogoUrl = (isDealerAccount || isProviderAccount || isDeliveryAccount) ? request.LogoUrl?.Trim() : null,
                 SupplierCategories = isProviderAccount ? string.Join(",", supplierCategories) : null,
                 IsVerifiedSupplier = false,
                 EmailConfirmed = true
@@ -108,6 +109,7 @@ public class AuthController : ControllerBase
             var roleName = normalizedType switch
             {
                 "provider" => "Provider",
+                "delivery" => "Delivery",
                 "dealer" => "Dealer",
                 "supplier" => "Supplier",
                 _ => "Customer"

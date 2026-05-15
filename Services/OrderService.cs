@@ -169,6 +169,16 @@ public class OrderService
     return await GetByIdForUserAsync(order.Id, userId);
   }
 
+  public async Task<List<OrderDto>> GetForDeliveryServiceAsync(string deliveryServiceName)
+  {
+    return await BuildOrdersQuery(
+        _context.Orders.Where(o =>
+            o.ShippingInfo != null &&
+            o.ShippingInfo.DeliveryService != null &&
+            o.ShippingInfo.DeliveryService == deliveryServiceName)
+    ).ToListAsync();
+  }
+
   private static OrderShippingInfo? BuildShippingInfo(ShippingInfoDto? shipping)
   {
     if (shipping == null)
