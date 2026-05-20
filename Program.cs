@@ -122,6 +122,7 @@ using (var scope = app.Services.CreateScope())
   }
   else if (db.Database.IsNpgsql())
   {
+    await db.Database.EnsureCreatedAsync();
     await ApplyPostgresCompatibilitySchemaAsync(db);
   }
 
